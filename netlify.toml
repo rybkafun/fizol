@@ -1,0 +1,29 @@
+# Konfiguracja Netlify – gra to statyczny plik HTML, nie wymaga budowania.
+[build]
+  publish = "public"
+
+# Bezpieczeństwo: gra nie łączy się z internetem i nie ładuje zewnętrznych plików.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Zawsze najnowsza wersja gry po wdrożeniu (postęp ucznia zostaje w localStorage).
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Stary adres pliku przekierowuje na stronę główną.
+[[redirects]]
+  from = "/park-drgan.html"
+  to = "/"
+  status = 301
