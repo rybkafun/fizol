@@ -1,0 +1,2278 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Park Drgań</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Układ: jedna kolumna, jedna rzecz naraz; mapa misji jako pionowa ścieżka.
+   Paleta: mglista szałwia + głęboki morski + morela; spokojna, nienasycona. */
+:root{
+  --bg:#ECEFEA; --surface:#FBFBF8; --surface2:#F1F4EF; --ink:#1E272B; --muted:#53606A; --line:#C9D3CD;
+  --primary:#2D6669; --primary-ink:#FFFFFF; --primary-soft:#D5E7E4;
+  --accent:#DB915A; --accent-soft:#F6E2CF; --rose:#C97F86; --lilac:#7E6DB8; --lilac-soft:#E5E0F3;
+  --ok:#2F7D4D; --ok-soft:#DCEFE2; --hint:#875B0C; --hint-soft:#FAEED3;
+  --tika:#86BDB4; --tika-dark:#4E8D85; --focus:#7A67C2;
+  --shadow:0 1px 2px rgba(30,39,43,.06),0 6px 18px rgba(30,39,43,.07);
+  --font:"Atkinson Hyperlegible","Lexend","Verdana","Segoe UI",system-ui,sans-serif;
+  --scale:1; --r:18px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141A1D; --surface:#1D2529; --surface2:#253035; --ink:#ECEFEA; --muted:#A9B5B3; --line:#3A4A51;
+  --primary:#7CC0BE; --primary-ink:#0F1A1C; --primary-soft:#22403F;
+  --accent:#EFB07A; --accent-soft:#45321F; --rose:#E3A0A6; --lilac:#B3A5E0; --lilac-soft:#2E2944;
+  --ok:#86D19F; --ok-soft:#1E3628; --hint:#EBC572; --hint-soft:#3A3020;
+  --tika:#6FA9A1; --tika-dark:#4B8079; --focus:#B3A5E0; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141A1D; --surface:#1D2529; --surface2:#253035; --ink:#ECEFEA; --muted:#A9B5B3; --line:#3A4A51;
+  --primary:#7CC0BE; --primary-ink:#0F1A1C; --primary-soft:#22403F;
+  --accent:#EFB07A; --accent-soft:#45321F; --rose:#E3A0A6; --lilac:#B3A5E0; --lilac-soft:#2E2944;
+  --ok:#86D19F; --ok-soft:#1E3628; --hint:#EBC572; --hint-soft:#3A3020;
+  --tika:#6FA9A1; --tika-dark:#4B8079; --focus:#B3A5E0; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+  color-scheme:dark}
+/* Wysoki kontrast: teksty pomocnicze i linie w kolorze tekstu */
+:root[data-contrast="high"]{--muted:var(--ink); --line:var(--ink)}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{font-size:calc(17px * var(--scale));-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.55;letter-spacing:.012em;word-spacing:.04em}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+h1{font-size:1.65rem;line-height:1.2;margin:0;text-wrap:balance}
+h2{font-size:1.28rem;line-height:1.3;margin:0;text-wrap:balance}
+h3{font-size:1.08rem;margin:0}
+p{margin:0}
+ul,ol{margin:0;padding-left:1.3rem}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+
+/* ---------- pasek górny ---------- */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.topbar-in{max-width:820px;margin:0 auto;display:flex;align-items:center;gap:.55rem;min-height:3.7rem}
+.brand{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.15}
+.brand b{font-size:1.05rem}
+.brand span{font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iconbtn{width:2.9rem;height:2.9rem;border-radius:50%;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;flex:none;padding:0}
+.iconbtn[aria-pressed="true"]{background:var(--primary-soft);border-color:var(--primary)}
+.pill{display:inline-flex;align-items:center;gap:.3rem;padding:.35rem .75rem;border-radius:999px;background:var(--accent-soft);font-weight:700;font-size:.88rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ic{display:inline-block;width:1.35em;height:1.35em;flex:none;vertical-align:-.28em}
+.ic svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ic.fill svg{fill:currentColor;stroke:none}
+
+main{max-width:820px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:1.25rem 4rem;display:flex;flex-direction:column;gap:1.1rem}
+main:focus{outline:none}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+.row{display:flex;gap:.6rem;align-items:center}
+.wrap{flex-wrap:wrap}
+.between{justify-content:space-between}
+.stack{display:flex;flex-direction:column;gap:.8rem}
+.card{background:var(--surface);border-radius:var(--r);padding:1.2rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.9rem;min-width:0}
+
+/* ---------- przyciski ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;min-height:3rem;padding:.65rem 1.25rem;border-radius:999px;
+  border:2px solid transparent;font-weight:700;cursor:pointer;text-align:center;line-height:1.2}
+.btn.primary{background:var(--primary);color:var(--primary-ink)}
+.btn.ghost{background:var(--surface);border-color:var(--line)}
+.btn.soft{background:var(--primary-soft)}
+.btn.big{min-height:3.6rem;font-size:1.15rem;padding-inline:1.8rem}
+.btn:disabled{opacity:.45;cursor:default}
+.btn:not(:disabled):active{transform:translateY(1px)}
+.toggle{border-radius:999px;border:2px solid var(--line);background:var(--surface);padding:.5rem 1rem;font-weight:700;min-height:2.75rem;cursor:pointer}
+.toggle[aria-pressed="true"]{background:var(--primary);color:var(--primary-ink);border-color:var(--primary)}
+.actions{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:flex-end}
+
+/* ---------- przewodniczka Tika ---------- */
+.say{display:flex;gap:.7rem;align-items:flex-end}
+.tika{width:62px;height:74px;flex:none}
+.tika-arm{transform-box:view-box;transform-origin:40px 70px;animation:tick 1.3s ease-in-out infinite alternate}
+@keyframes tick{from{transform:rotate(-13deg)}to{transform:rotate(13deg)}}
+.bubble{background:var(--surface);border-radius:18px 18px 18px 5px;padding:.8rem 1rem;box-shadow:var(--shadow);font-size:1.05rem;min-width:0;flex:1}
+body.focus .tika,body.focus .deco{display:none}
+body.focus .bubble{border-radius:14px}
+body.noanim .tika-arm{animation:none}
+
+/* ---------- mapa ---------- */
+.progress{height:12px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);overflow:hidden}
+.progress>i{display:block;height:100%;background:var(--primary);border-radius:999px}
+.path{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.8rem;position:relative}
+.path::before{content:"";position:absolute;left:calc(1rem + 1.4rem);top:1.5rem;bottom:1.5rem;border-left:3px dashed var(--line)}
+.node{position:relative;display:flex;gap:.9rem;align-items:center;width:100%;text-align:left;background:var(--surface);border:2px solid var(--line);
+  border-radius:var(--r);padding:.85rem 1rem;cursor:pointer;min-height:4.4rem}
+.node .num{width:2.8rem;height:2.8rem;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:700;font-size:1.1rem;background:var(--primary-soft);color:var(--ink)}
+.node .txt{flex:1;min-width:0;display:flex;flex-direction:column}
+.node .txt b{font-size:1.05rem}
+.node .txt span{font-size:.85rem;color:var(--muted)}
+.node.done .num{background:var(--ok-soft);color:var(--ok)}
+.node.next{border-color:var(--primary);box-shadow:var(--shadow)}
+.node.locked{opacity:.55;cursor:not-allowed}
+.stars{display:inline-flex;gap:2px;color:var(--accent)}
+.stars .off{color:var(--line)}
+.tag-next{font-size:.72rem;font-weight:700;background:var(--primary);color:var(--primary-ink);border-radius:999px;padding:.1rem .55rem;align-self:flex-start;margin-bottom:.15rem}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,165px),1fr));gap:.7rem}
+.mode{display:flex;flex-direction:column;align-items:flex-start;gap:.35rem;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:var(--r);
+  padding:.95rem;cursor:pointer;min-height:7rem}
+.mode .ic{width:1.8rem;height:1.8rem;color:var(--primary)}
+.mode b{font-size:1rem}
+.mode span{font-size:.84rem;color:var(--muted);line-height:1.35}
+.count-badge{background:var(--accent-soft);border-radius:999px;padding:0 .5rem;font-weight:700;font-size:.8rem}
+.sec{margin-top:.6rem}
+
+/* ---------- misja ---------- */
+.stepbar{display:flex;gap:4px}
+.stepbar span{flex:1;height:8px;border-radius:4px;background:var(--line)}
+.stepbar span.d{background:var(--primary)}
+.stepbar span.c{background:var(--accent)}
+.sim{display:block;width:100%;height:clamp(230px,42vh,370px);background:var(--surface2);border-radius:var(--r);border:1px solid var(--line);touch-action:manipulation}
+.sim.mini{height:clamp(170px,28vh,240px)}
+.readout{font-weight:700;font-variant-numeric:tabular-nums;padding:.55rem .85rem;border-radius:12px;background:var(--surface2);border:1px solid var(--line)}
+.digits{font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums}
+.goal{background:var(--ok-soft);border-radius:12px;padding:.65rem .9rem;font-weight:700}
+.sl{display:flex;flex-direction:column;gap:.1rem}
+.sl .row{justify-content:space-between}
+.sl output{font-weight:700;font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:2.75rem;background:transparent;margin:0;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:10px;border-radius:5px;background:var(--line)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:var(--primary);border:4px solid var(--surface);box-shadow:0 0 0 2px var(--primary);margin-top:-10px}
+input[type=range]::-moz-range-track{height:10px;border-radius:5px;background:var(--line)}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--primary);border:4px solid var(--surface)}
+input[type=range]:disabled{opacity:.6}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:.45rem .6rem;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font-size:.82rem;color:var(--muted)}
+.ebar{display:grid;grid-template-columns:minmax(6.5rem,auto) 1fr 3.2rem;gap:.6rem;align-items:center}
+.ebar .track{height:1.15rem;border-radius:999px;background:var(--surface2);overflow:hidden;border:1px solid var(--line)}
+.ebar .fill{height:100%;border-radius:999px}
+.ebar output{font-variant-numeric:tabular-nums;font-weight:700;text-align:right}
+.tabs{display:flex;gap:.4rem;flex-wrap:wrap}
+.tabs [role=tab]{border-radius:999px;border:2px solid var(--line);background:var(--surface);padding:.5rem 1.1rem;font-weight:700;cursor:pointer;min-height:2.75rem}
+.tabs [role=tab][aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chal{background:var(--lilac-soft);border-radius:14px;padding:.85rem 1rem;display:flex;flex-direction:column;gap:.6rem}
+.chal p{font-weight:700}
+
+/* ---------- zadania ---------- */
+.qmeta{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;font-size:.85rem;color:var(--muted)}
+.tag{background:var(--lilac-soft);color:var(--ink);border-radius:999px;padding:.15rem .65rem;font-weight:700}
+.dots{display:inline-flex;gap:3px}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--accent)}
+.qtext{font-size:1.3rem}
+.qtext:focus{outline:none}
+.qbody{display:flex;flex-direction:column;gap:.8rem;min-width:0}
+.opts{display:grid;gap:.6rem}
+.opt{display:flex;gap:.75rem;align-items:center;text-align:left;min-height:3.3rem;padding:.75rem 1rem;border-radius:14px;border:2px solid var(--line);background:var(--surface);cursor:pointer;font-size:1.05rem}
+.optkey{width:1.8rem;height:1.8rem;border-radius:50%;background:var(--surface2);display:grid;place-items:center;font-size:.85rem;font-weight:700;flex:none}
+.opt.sel{border-color:var(--primary);background:var(--primary-soft)}
+.opt.tried{opacity:.5;border-style:dashed}
+.opt.right{border-color:var(--ok);background:var(--ok-soft);opacity:1}
+.opt:disabled{cursor:default}
+.tfrow{grid-template-columns:1fr 1fr}
+.note{font-size:.9rem;color:var(--muted)}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.mcol{display:flex;flex-direction:column;gap:.55rem;min-width:0}
+.mitem{position:relative;text-align:left;padding:.65rem .8rem .65rem .8rem;border-radius:12px;border:2px solid var(--line);background:var(--surface);cursor:pointer;min-height:3.1rem;font-size:.97rem;line-height:1.35}
+.mitem.sel{border-color:var(--focus);background:var(--lilac-soft)}
+.mitem[data-n]{border-color:var(--pc);padding-right:2.2rem}
+.mitem[data-n]::after{content:attr(data-n);position:absolute;right:.45rem;top:50%;transform:translateY(-50%);width:1.45rem;height:1.45rem;border-radius:50%;background:var(--pc);color:var(--surface);font-size:.8rem;font-weight:700;display:grid;place-items:center}
+.mitem.bad{border-style:dashed}
+.slot-line{font-size:1.15rem;line-height:2.8}
+.formula .slot-line{font-size:1.7rem;text-align:center;font-weight:700}
+.slot{display:inline-flex;align-items:center;justify-content:center;min-width:5.2rem;min-height:2.6rem;padding:0 .7rem;margin:0 .2rem;vertical-align:middle;border:2px dashed var(--primary);border-radius:10px;background:var(--surface2);font-weight:700;cursor:pointer;line-height:1.2}
+.formula .slot{min-width:3.4rem;min-height:3.2rem;font-size:1.6rem}
+.slot.filled{border-style:solid;background:var(--primary-soft)}
+.slot.hover{background:var(--lilac-soft);border-color:var(--focus)}
+.slot.bad{border-color:var(--rose)}
+.slot.revealed{border-color:var(--ok);background:var(--ok-soft)}
+.bank{display:flex;flex-wrap:wrap;gap:.55rem;padding:.75rem;border-radius:14px;background:var(--surface2);border:1px solid var(--line);min-height:3.8rem}
+.chip{touch-action:none;user-select:none;-webkit-user-select:none;border-radius:10px;border:2px solid var(--ink);background:var(--surface);padding:.45rem .9rem;font-weight:700;cursor:grab;min-height:2.7rem;font-size:1.05rem}
+.chip.dragging{opacity:.35}
+.chip.ghost{position:fixed;pointer-events:none;transform:translate(-50%,-50%) scale(1.06);z-index:100;box-shadow:var(--shadow)}
+.svgwrap{background:var(--surface2);border-radius:var(--r);border:1px solid var(--line);padding:.4rem}
+.qsvg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+.svg-lbl{fill:var(--ink);font:700 15px var(--font)}
+.hot{cursor:pointer}
+.hot:focus{outline:none}
+.hot:focus-visible .hot-shape,.hot:hover .hot-shape{stroke:var(--focus)!important;stroke-width:4px!important}
+.hot.sel .hot-shape{stroke:var(--focus)!important;stroke-width:6px!important}
+.hot.tried{opacity:.4}
+.hot.right .hot-shape{stroke:var(--ok)!important;stroke-width:6px!important}
+.calc-data{display:grid;grid-template-columns:auto 1fr;gap:.2rem .8rem;background:var(--surface2);border-radius:12px;padding:.75rem 1rem;font-variant-numeric:tabular-nums}
+.calc-data dt{font-weight:700;color:var(--muted)}
+.calc-data dd{margin:0}
+.lbl{font-weight:700}
+.numin{font:inherit;font-size:1.25rem;font-weight:700;width:9rem;max-width:100%;min-height:3rem;padding:.4rem .7rem;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-variant-numeric:tabular-nums}
+.numin:focus{border-color:var(--primary)}
+.numin.okv{border-color:var(--ok);background:var(--ok-soft)}
+.choice{border-radius:10px;border:2px solid var(--line);background:var(--surface);padding:.45rem .85rem;font-weight:700;cursor:pointer;min-height:2.75rem}
+.choice[aria-checked="true"]{border-color:var(--primary);background:var(--primary-soft)}
+.choice.right{border-color:var(--ok);background:var(--ok-soft)}
+.helpbox{background:var(--hint-soft);border-radius:14px;padding:.85rem 1rem;display:flex;flex-direction:column;gap:.35rem}
+.hb-t{font-weight:700;color:var(--hint)}
+.feedback:empty{display:none}
+.feedback{border-radius:14px;padding:.9rem 1rem;display:flex;flex-direction:column;gap:.45rem}
+.fb-ok{background:var(--ok-soft)}
+.fb-hint{background:var(--hint-soft)}
+.fb-learn{background:var(--lilac-soft)}
+.fb-t{font-weight:700;font-size:1.1rem}
+.pts{font-weight:700;color:var(--ok)}
+.qactions{display:flex;gap:.6rem;justify-content:space-between;flex-wrap:wrap}
+.qactions .btn.primary{margin-left:auto}
+.qcard{position:relative}
+.burst{position:absolute;right:2.2rem;top:1.2rem;pointer-events:none;width:0;height:0}
+.burst i{position:absolute;width:12px;height:12px;background:var(--accent);clip-path:polygon(50% 0,61% 38%,100% 50%,61% 62%,50% 100%,39% 62%,0 50%,39% 38%);animation:fly 1s ease-out forwards}
+@keyframes fly{from{transform:translate(0,0) scale(.6);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(1.1);opacity:0}}
+body.noanim .burst{display:none}
+
+/* ---------- podsumowania, kolekcja ---------- */
+.bigstars{display:flex;gap:.4rem;color:var(--accent);justify-content:center}
+.bigstars .ic{width:3rem;height:3rem}
+.bigstars .off{color:var(--line)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,130px),1fr));gap:.6rem}
+.stat{background:var(--surface2);border-radius:14px;padding:.7rem .9rem;display:flex;flex-direction:column}
+.stat b{font-size:1.4rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.82rem;color:var(--muted)}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:.6rem}
+.badge{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.3rem;padding:.8rem .6rem;border-radius:14px;background:var(--surface2);border:2px solid var(--line)}
+.badge .medal{width:3rem;height:3rem;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.badge .medal .ic{width:1.7rem;height:1.7rem}
+.badge b{font-size:.92rem;line-height:1.25}
+.badge span{font-size:.78rem;color:var(--muted);line-height:1.3}
+.badge.locked{opacity:.5}
+.badge.locked .medal{background:var(--surface);color:var(--muted)}
+.skins{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,120px),1fr));gap:.6rem}
+.skin{display:flex;flex-direction:column;align-items:center;gap:.25rem;padding:.6rem;border-radius:14px;border:2px solid var(--line);background:var(--surface);cursor:pointer;font-size:.85rem;text-align:center}
+.skin canvas{width:64px;height:64px}
+.skin[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-soft)}
+.skin:disabled{opacity:.5;cursor:default}
+.chips-list{display:flex;flex-wrap:wrap;gap:.4rem}
+.cchip{border-radius:999px;padding:.25rem .75rem;font-size:.9rem;font-weight:700}
+.cchip.good{background:var(--ok-soft)}
+.cchip.rev{background:var(--hint-soft)}
+.mlist{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.5rem}
+.mlist li{background:var(--surface2);border-radius:12px;padding:.65rem .85rem;display:flex;flex-direction:column;gap:.1rem}
+.mlist li span{font-size:.82rem;color:var(--muted)}
+
+/* ---------- przerwa ---------- */
+.breath{width:min(220px,60vw);aspect-ratio:1;max-width:100%;border-radius:50%;margin:1rem auto;display:grid;place-items:center;
+  background:radial-gradient(circle,var(--primary-soft) 0 55%,var(--surface2) 56%);font-size:2.6rem;font-weight:700;font-variant-numeric:tabular-nums}
+body:not(.noanim) .breath{animation:breathe 8s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(.88)}50%{transform:scale(1.05)}}
+
+/* ---------- ustawienia (panel) ---------- */
+#overlay{position:fixed;inset:0;z-index:50;background:rgba(15,22,25,.45);display:flex;justify-content:center;align-items:flex-end;
+  padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
+.sheet{background:var(--surface);width:100%;max-width:560px;max-height:88vh;overflow-y:auto;border-radius:22px 22px 0 0;padding:1.2rem max(16px,1.2rem) calc(1.4rem + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:1rem}
+@media (min-width:640px){#overlay{align-items:center}.sheet{border-radius:22px}}
+.setrow{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding-block:.35rem;border-bottom:1px solid var(--line)}
+.setrow>div{min-width:0}
+.setrow small{display:block;color:var(--muted);font-size:.82rem}
+.switch{width:3.5rem;height:2.05rem;border-radius:999px;background:var(--line);position:relative;border:none;cursor:pointer;flex:none}
+.switch::after{content:"";position:absolute;top:.27rem;left:.27rem;width:1.5rem;height:1.5rem;border-radius:50%;background:var(--surface);transition:transform .2s}
+.switch[aria-checked="true"]{background:var(--primary)}
+.switch[aria-checked="true"]::after{transform:translateX(1.45rem)}
+.seg{display:flex;flex-wrap:wrap;gap:.35rem}
+.seg button{border-radius:999px;border:2px solid var(--line);background:var(--surface);padding:.35rem .8rem;font-weight:700;cursor:pointer;min-height:2.6rem}
+.seg button[aria-pressed="true"]{background:var(--primary);color:var(--primary-ink);border-color:var(--primary)}
+
+/* ---------- powiadomienia ---------- */
+#toasts{position:fixed;left:0;right:0;bottom:calc(1rem + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:.5rem;z-index:60;pointer-events:none;padding-inline:16px}
+.toast{background:var(--ink);color:var(--surface);border-radius:14px;padding:.7rem 1.1rem;font-weight:700;box-shadow:var(--shadow);max-width:100%;display:flex;gap:.5rem;align-items:center}
+body:not(.noanim) .toast{animation:rise .35s ease-out}
+@keyframes rise{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+
+/* ---------- ściągawka ---------- */
+.cheat{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:.8rem}
+.cheat section{background:var(--surface);border-radius:14px;padding:1rem 1.1rem;border:1px solid var(--line);display:flex;flex-direction:column;gap:.5rem;min-width:0}
+.cheat dl{margin:0;display:flex;flex-direction:column;gap:.35rem}
+.cheat dt{font-weight:700}
+.cheat dd{margin:0 0 .2rem;color:var(--muted)}
+.fml{display:flex;justify-content:space-between;gap:.8rem;align-items:baseline;border-bottom:1px dashed var(--line);padding-block:.3rem;flex-wrap:wrap}
+.fml b{font-size:1.25rem;white-space:nowrap}
+.fml span{font-size:.85rem;color:var(--muted)}
+.cheat .wide{grid-column:1/-1}
+
+body.noanim *,body.noanim *::before,body.noanim *::after{transition:none!important}
+@media (prefers-reduced-motion:reduce){.tika-arm,.breath,.toast,.burst i{animation:none!important}}
+@media print{
+  .topbar,.no-print,#toasts,#overlay{display:none!important}
+  body{background:#fff;color:#000}
+  main{max-width:none;padding:0}
+  .cheat section{break-inside:avoid;border:1px solid #888}
+  .cheat dd,.fml span{color:#333}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <button id="btnHome" class="iconbtn" type="button" aria-label="Wróć na mapę misji"></button>
+    <div class="brand"><b>Park Drgań</b><span id="crumb">Fizyka · klasa 8</span></div>
+    <span class="pill" id="hudPts" title="Twoje punkty"></span>
+    <button id="btnSound" class="iconbtn" type="button" aria-pressed="false" aria-label="Dźwięk"></button>
+    <button id="btnSettings" class="iconbtn" type="button" aria-label="Ustawienia"></button>
+  </div>
+</header>
+<main id="app" tabindex="-1"></main>
+<div id="toasts" aria-live="polite"></div>
+<div id="overlay" hidden></div>
+<noscript><p style="padding:1rem">Gra potrzebuje włączonej obsługi JavaScriptu.</p></noscript>
+<script>
+'use strict';
+/* =====================================================================
+   PARK DRGAŃ – gra edukacyjna z fizyki (kl. 8)
+   Struktura kodu:
+   1. Narzędzia            5. Rysowanie (canvas, SVG)
+   2. Zapis i stan gry     6. Silnik zadań (typy zadań)
+   3. Dźwięk               7. Ekrany (mapa, misja, testy, ...)
+   4. Pętla animacji       8. MODUŁY FIZYKI (dane + eksperymenty)
+   Nowy moduł dodajesz funkcją registerModule({...}) – patrz sekcja 8.
+   ===================================================================== */
+document.documentElement.lang = 'pl';
+
+/* ===== 1. NARZĘDZIA ===== */
+const $ = (s, r = document) => r.querySelector(s);
+// Tworzenie elementów: h('button', {class:'btn', onclick: fn}, 'Tekst')
+function h(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    const v = attrs[k];
+    if (v == null || v === false) continue;
+    if (k === 'class') e.className = v;
+    else if (k === 'html') e.innerHTML = v;
+    else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2).toLowerCase(), v);
+    else e.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat(Infinity)) {
+    if (c == null || c === false) continue;
+    e.append(c.nodeType ? c : document.createTextNode(String(c)));
+  }
+  return e;
+}
+const rnd = a => a[Math.floor(Math.random() * a.length)];
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+// Liczby po polsku: przecinek dziesiętny
+function fmt(x, d = 3) { const r = Math.round(x * 10 ** d) / 10 ** d; return String(r).replace('.', ','); }
+// Odczyt liczby wpisanej przez ucznia: akceptuje przecinek, kropkę, spacje, jednostkę na końcu i ułamek a/b
+function parseNum(s) {
+  if (s == null) return NaN;
+  s = String(s).trim().toLowerCase().replace(/\s+/g, '').replace(/,/g, '.');
+  const m = s.match(/^([-+]?\d*\.?\d+)(?:\/(\d*\.?\d+))?/);
+  if (!m) return NaN;
+  let v = parseFloat(m[1]); if (m[2]) v /= parseFloat(m[2]);
+  return v;
+}
+// Odmiana: 1 pełne drganie, 2 pełne drgania, 5 pełnych drgań
+function pelne(n) {
+  const n10 = n % 10, n100 = n % 100;
+  if (n === 1) return '1 pełne drganie';
+  if (n10 >= 2 && n10 <= 4 && !(n100 >= 12 && n100 <= 14)) return n + ' pełne drgania';
+  return n + ' pełnych drgań';
+}
+const todayStr = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+function dayDiff(a, b) { const p = a.split('-').map(Number), q = b.split('-').map(Number); return Math.round((Date.UTC(q[0], q[1] - 1, q[2]) - Date.UTC(p[0], p[1] - 1, p[2])) / 864e5); }
+const isTyping = e => e.target && e.target.matches && e.target.matches('input[type=text],input:not([type]),textarea,select');
+
+/* ===== 2. ZAPIS I STAN GRY ===== */
+const STORE_KEY = 'parkDrgan.v1';
+const Store = {
+  ok: true,
+  load() { try { const s = localStorage.getItem(STORE_KEY); return s ? JSON.parse(s) : null; } catch (e) { this.ok = false; return null; } },
+  save(d) { try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch (e) { this.ok = false; } }
+};
+function defaults() {
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return {
+    v: 1, modId: 'drgania', points: 0, stars: {}, done: {}, badges: {}, mistakes: {}, flags: {},
+    fixed: 0, calcOk: 0, measurements: 0, answered: 0, sessions: 0, skin: 'klasyk', skinsSeen: {},
+    streak: { last: null, count: 0, best: 0, days: 0 },
+    settings: { sound: false, volume: 0.5, anim: !reduce, focus: false, scale: 1, contrast: false, theme: 'auto', difficulty: 2, unlockAll: false }
+  };
+}
+function merge(def, src) {
+  if (!src || typeof src !== 'object') return def;
+  for (const k in def) {
+    if (def[k] && typeof def[k] === 'object' && !Array.isArray(def[k])) def[k] = merge(def[k], src[k]);
+    else if (src[k] !== undefined) def[k] = src[k];
+  }
+  for (const k in src) if (!(k in def)) def[k] = src[k];
+  return def;
+}
+let S = merge(defaults(), Store.load());
+const persist = () => Store.save(S);
+
+// Seria dni: przerwa jednego dnia NIE przerywa serii; dłuższa przerwa – seria zaczyna się od nowa, bez kary
+function updateStreak() {
+  const t = todayStr(), st = S.streak;
+  if (st.last === t) return null;
+  let msg;
+  if (!st.last) { st.count = 1; msg = 'first'; }
+  else {
+    const d = dayDiff(st.last, t);
+    if (d >= 1 && d <= 2) { st.count++; msg = d === 2 ? 'grace' : 'cont'; }
+    else { st.count = 1; msg = 'back'; }
+  }
+  st.days++; st.last = t; st.best = Math.max(st.best, st.count);
+  persist();
+  return msg;
+}
+
+/* ===== 3. DŹWIĘK (Web Audio, cicho i łagodnie, domyślnie wyłączony) ===== */
+const Sound = {
+  ctx: null,
+  play(kind) {
+    if (!S.settings.sound) return;
+    try {
+      if (!this.ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; this.ctx = new AC(); }
+      const ctx = this.ctx; if (ctx.state === 'suspended') ctx.resume();
+      // Brak dźwięku "porażki" – tylko miękkie, wznoszące się tony
+      const seq = { ok: [523.25, 659.25], good: [659.25, 783.99], badge: [523.25, 659.25, 783.99], tap: [392], push: [261.6], done: [392, 523.25, 659.25, 783.99] }[kind] || [440];
+      const vol = 0.05 * S.settings.volume * (kind === 'tap' ? 0.5 : 1);
+      seq.forEach((f, i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine'; o.frequency.value = f;
+        const t0 = ctx.currentTime + i * 0.12;
+        g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.4);
+        o.connect(g).connect(ctx.destination); o.start(t0); o.stop(t0 + 0.45);
+      });
+    } catch (e) { /* brak dźwięku nie przeszkadza w grze */ }
+  }
+};
+
+/* ===== 4. PĘTLA ANIMACJI I SPRZĄTANIE EKRANÓW ===== */
+// Każda animacja jest przypięta do elementu – gdy element znika ze strony, animacja sama się wyłącza.
+const Loop = {
+  items: new Set(), raf: 0, last: 0,
+  add(fn, el) { const it = { fn, el }; this.items.add(it); this.start(); return () => this.items.delete(it); },
+  start() {
+    if (this.raf) return;
+    this.last = performance.now();
+    const tick = now => {
+      const dt = Math.min(0.05, Math.max(0, (now - this.last) / 1000)); this.last = now;
+      for (const it of [...this.items]) {
+        if (it.el && !it.el.isConnected) { this.items.delete(it); continue; }
+        try { it.fn(dt, now); } catch (e) { console.error(e); this.items.delete(it); }
+      }
+      this.raf = this.items.size ? requestAnimationFrame(tick) : 0;
+    };
+    this.raf = requestAnimationFrame(tick);
+  },
+  clear() { this.items.clear(); }
+};
+const Keys = new Set();
+function onKey(fn, el) { const it = { fn, el }; Keys.add(it); return () => Keys.delete(it); }
+const Cleanups = [];
+const onCleanup = fn => Cleanups.push(fn);
+function cleanupScreen() {
+  Loop.clear(); Keys.clear();
+  while (Cleanups.length) { try { Cleanups.pop()(); } catch (e) { } }
+}
+
+/* ===== 5. RYSOWANIE ===== */
+const G = 9.81; // przyspieszenie ziemskie [m/s²]
+let COL = {};
+function readColors() {
+  const cs = getComputedStyle(document.documentElement);
+  const map = { bg: 'bg', surface: 'surface', surface2: 'surface2', ink: 'ink', muted: 'muted', line: 'line', primary: 'primary', primarySoft: 'primary-soft', accent: 'accent', rose: 'rose', lilac: 'lilac', ok: 'ok', hint: 'hint', font: 'font' };
+  for (const k in map) COL[k] = cs.getPropertyValue('--' + map[k]).trim() || '#888';
+}
+// Dopasowanie rozdzielczości canvasa do ekranu (ostre linie na telefonie)
+function fit(cv) {
+  const r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const W = Math.max(1, Math.round(r.width * dpr)), H = Math.max(1, Math.round(r.height * dpr));
+  if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, r.width, r.height);
+  return { ctx, w: r.width, h: r.height };
+}
+function rr(ctx, x, y, w, hh, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + hh, r); ctx.arcTo(x + w, y + hh, x, y + hh, r); ctx.arcTo(x, y + hh, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function txt(ctx, s, x, y, o = {}) {
+  ctx.fillStyle = o.color || COL.ink; ctx.font = `${o.weight || 700} ${o.size || 14}px ${COL.font}`;
+  ctx.textAlign = o.align || 'center'; ctx.textBaseline = o.base || 'middle'; ctx.fillText(s, x, y);
+}
+function dash(ctx, x1, y1, x2, y2, color, w = 2) { ctx.save(); ctx.setLineDash([5, 6]); ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.restore(); }
+function arrow(ctx, x1, y1, x2, y2, color, both = false, w = 3) {
+  const a = Math.atan2(y2 - y1, x2 - x1), s = 9;
+  ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+  const head = (x, y, an) => { ctx.moveTo(x, y); ctx.lineTo(x - s * Math.cos(an - 0.45), y - s * Math.sin(an - 0.45)); ctx.moveTo(x, y); ctx.lineTo(x - s * Math.cos(an + 0.45), y - s * Math.sin(an + 0.45)); };
+  if (Math.hypot(x2 - x1, y2 - y1) > 6) { head(x2, y2, a); if (both) head(x1, y1, a + Math.PI); }
+  ctx.stroke(); ctx.restore();
+}
+function drawCeiling(ctx, cx, y, w) {
+  ctx.fillStyle = COL.line; ctx.fillRect(cx - w / 2, y - 8, w, 8);
+  ctx.strokeStyle = COL.muted; ctx.lineWidth = 1.2; ctx.beginPath();
+  for (let x = cx - w / 2 + 4; x < cx + w / 2; x += 10) { ctx.moveTo(x, y - 8); ctx.lineTo(x + 7, y - 15); }
+  ctx.stroke();
+}
+// Skórki kulki wahadła (kolekcja nagród)
+const SKINS = [
+  { id: 'klasyk', name: 'Klasyczna kula', cost: 0 },
+  { id: 'ksiezyc', name: 'Księżyc', cost: 60 },
+  { id: 'planeta', name: 'Planeta z pierścieniem', cost: 150 },
+  { id: 'krysztal', name: 'Kryształ', cost: 250 },
+  { id: 'kwiat', name: 'Kwiat', cost: 380 },
+  { id: 'kropla', name: 'Kropla', cost: 520 },
+  { id: 'gwiazda', name: 'Gwiazda', cost: 680 },
+  { id: 'zlota', name: 'Złota kula', cost: 850 }
+];
+function drawBob(ctx, x, y, r, skin) {
+  skin = skin || S.skin;
+  ctx.save(); ctx.translate(x, y);
+  const circle = (cx, cy, rad, fill) => { ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2); ctx.fillStyle = fill; ctx.fill(); };
+  switch (skin) {
+    case 'ksiezyc': circle(0, 0, r, '#E6E0C8'); circle(-r * .3, -r * .25, r * .22, '#CBC3A6'); circle(r * .35, r * .2, r * .16, '#CBC3A6'); circle(-r * .1, r * .45, r * .1, '#CBC3A6'); break;
+    case 'planeta':
+      circle(0, 0, r, '#C99F7B'); ctx.fillStyle = 'rgba(255,255,255,.25)'; ctx.fillRect(-r, -r * .2, r * 2, r * .18);
+      ctx.strokeStyle = '#8A79BF'; ctx.lineWidth = Math.max(2, r * .16); ctx.beginPath(); ctx.ellipse(0, 0, r * 1.55, r * .45, -0.35, 0, Math.PI * 2); ctx.stroke(); break;
+    case 'krysztal':
+      ctx.beginPath(); for (let i = 0; i < 6; i++) { const a = Math.PI / 6 + i * Math.PI / 3; ctx.lineTo(r * 1.1 * Math.cos(a), r * 1.1 * Math.sin(a)); } ctx.closePath();
+      ctx.fillStyle = '#86C3D6'; ctx.fill(); ctx.strokeStyle = '#4E93A8'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, -r * 1.1); ctx.lineTo(0, r * 1.1); ctx.moveTo(-r * .95, -r * .55); ctx.lineTo(r * .95, r * .55); ctx.stroke(); break;
+    case 'kwiat':
+      for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3; circle(Math.cos(a) * r * .58, Math.sin(a) * r * .58, r * .5, '#E39FAE'); }
+      circle(0, 0, r * .45, '#F0C46A'); break;
+    case 'kropla':
+      ctx.beginPath(); ctx.moveTo(0, -r * 1.35); ctx.bezierCurveTo(r * .9, -r * .3, r, r * .2, r, r * .3); ctx.arc(0, r * .3, r, 0, Math.PI); ctx.bezierCurveTo(-r, r * .2, -r * .9, -r * .3, 0, -r * 1.35);
+      ctx.fillStyle = '#79AEDD'; ctx.fill(); break;
+    case 'gwiazda':
+      ctx.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rad = i % 2 ? r * .5 : r * 1.2; ctx.lineTo(rad * Math.cos(a), rad * Math.sin(a)); } ctx.closePath();
+      ctx.fillStyle = '#EDBE55'; ctx.fill(); ctx.strokeStyle = '#B88A22'; ctx.lineWidth = 1.5; ctx.stroke(); break;
+    case 'zlota': { const g = ctx.createRadialGradient(-r * .35, -r * .35, r * .1, 0, 0, r); g.addColorStop(0, '#FFF0B8'); g.addColorStop(1, '#C3922B'); circle(0, 0, r, g); break; }
+    default: { const g = ctx.createRadialGradient(-r * .35, -r * .35, r * .1, 0, 0, r); g.addColorStop(0, '#F6D3B4'); g.addColorStop(1, COL.accent); circle(0, 0, r, g); }
+  }
+  ctx.restore();
+}
+function drawPendulum(ctx, px, py, len, th, r, skin) {
+  const x = px + len * Math.sin(th), y = py + len * Math.cos(th);
+  ctx.strokeStyle = COL.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(x, y); ctx.stroke();
+  ctx.fillStyle = COL.ink; ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2); ctx.fill();
+  drawBob(ctx, x, y, r, skin);
+  return { x, y };
+}
+// Huśtawka widziana z boku: rama, lina i siedzisko
+function drawSwing(ctx, px, py, len, th, groundY) {
+  ctx.strokeStyle = COL.line; ctx.lineWidth = 7; ctx.lineCap = 'round';
+  const half = len * 0.62;
+  ctx.beginPath(); ctx.moveTo(px - half, py); ctx.lineTo(px + half, py);
+  ctx.moveTo(px - half, py); ctx.lineTo(px - half - len * .2, groundY); ctx.moveTo(px + half, py); ctx.lineTo(px + half + len * .2, groundY); ctx.stroke();
+  ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(px - half - len * .3, groundY); ctx.lineTo(px + half + len * .3, groundY); ctx.stroke();
+  const sx = px + len * Math.sin(th), sy = py + len * Math.cos(th);
+  ctx.strokeStyle = COL.ink; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(sx, sy); ctx.stroke();
+  ctx.save(); ctx.translate(sx, sy); ctx.rotate(-th);
+  ctx.fillStyle = COL.primary; rr(ctx, -26, -2, 52, 10, 5); ctx.fill();
+  ctx.fillStyle = COL.accent; rr(ctx, -16, -9, 32, 8, 4); ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = COL.ink; ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2); ctx.fill();
+  return { x: sx, y: sy };
+}
+function drawSpring(ctx, x, y0, y1, coils = 11, w = 16) {
+  const lead = 8, L = y1 - y0 - 2 * lead;
+  ctx.strokeStyle = COL.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y0); ctx.lineTo(x, y0 + lead);
+  for (let i = 1; i <= coils * 2; i++) ctx.lineTo(x + (i % 2 ? w : -w), y0 + lead + L * (i - 0.5) / (coils * 2));
+  ctx.lineTo(x, y1 - lead); ctx.lineTo(x, y1); ctx.stroke();
+}
+
+/* ----- Ikony (proste linie, bez zewnętrznych plików) ----- */
+const ICONS = {
+  map: '<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>',
+  gear: '<circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>',
+  sound: '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>',
+  mute: '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9.5l5 5M22 9.5l-5 5"/>',
+  swing: '<path d="M3 3h18M8 3v12M16 3v12M6 15h12v2.5H6z"/>',
+  clock: '<circle cx="12" cy="8" r="5.5"/><path d="M12 8V5.5M12 8l2 1.2M12 13.5v5"/><circle cx="12" cy="20.5" r="1.6"/>',
+  flask: '<path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7 15h10"/>',
+  spring: '<path d="M12 2v3l5 2-10 3 10 3-10 3 5 2"/><rect x="8" y="18" width="8" height="4.5" rx="1.5"/>',
+  bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/>',
+  bridge: '<path d="M2 18h20M4 18v-5M20 18v-5M2 13c3-6 17-6 20 0M8 10.5V18M12 9.6V18M16 10.5V18"/>',
+  timer: '<circle cx="12" cy="13" r="8"/><path d="M12 13V9M10 2h4M12 2v3"/>',
+  pencil: '<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>',
+  clip: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M8.5 11l2 2 4-4M8.5 17h7"/>',
+  redo: '<path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"/>',
+  sheet: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>',
+  trophy: '<path d="M8 4h8v5a4 4 0 0 1-8 0V4zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M9 17h6v4H9z"/>',
+  lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  star: '<path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>',
+  help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17.2v.1"/>',
+  play: '<path d="M8 5v14l11-7z"/>',
+  pause: '<path d="M8 5v14M16 5v14"/>',
+  back: '<path d="M15 5l-7 7 7 7"/>',
+  heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  flame: '<path d="M12 21a6 6 0 0 0 6-6c0-4-3-6-4-10-2 2-3 4-3 6-1-1-1.5-2-1.5-3C7 10 6 12.5 6 15a6 6 0 0 0 6 6z"/>',
+  leaf: '<path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15M5 19l7-7"/>'
+};
+function icon(name, fill) { return h('span', { class: 'ic' + (fill ? ' fill' : ''), 'aria-hidden': 'true', html: `<svg viewBox="0 0 24 24">${ICONS[name] || ''}</svg>` }); }
+function starsEl(n, total = 3) { const s = h('span', { class: 'stars', 'aria-label': `${n} z ${total} gwiazdek` }); for (let i = 0; i < total; i++) { const st = icon('star', true); if (i >= n) st.classList.add('off'); s.append(st); } return s; }
+
+/* ----- Tika: przewodniczka-metronom (oryginalna postać) ----- */
+const TIKA_SVG = `<svg class="tika" viewBox="0 0 80 96" aria-hidden="true">
+<g class="tika-arm"><line x1="40" y1="70" x2="40" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round" style="color:var(--ink)"/><rect x="34" y="10" width="12" height="9" rx="3" style="fill:var(--accent)"/></g>
+<path d="M30 16h20l17 66a6 6 0 0 1-6 7.5H19a6 6 0 0 1-6-7.5z" style="fill:var(--tika)"/>
+<rect x="17" y="72" width="46" height="15" rx="6" style="fill:var(--tika-dark)"/>
+<circle cx="32" cy="48" r="4.2" style="fill:var(--ink)"/><circle cx="48" cy="48" r="4.2" style="fill:var(--ink)"/>
+<circle cx="33.4" cy="46.6" r="1.4" fill="#fff"/><circle cx="49.4" cy="46.6" r="1.4" fill="#fff"/>
+<circle cx="26" cy="56" r="3" style="fill:var(--rose);opacity:.55"/><circle cx="54" cy="56" r="3" style="fill:var(--rose);opacity:.55"/>
+<path d="M35 57q5 4.5 10 0" style="fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round"/>
+</svg>`;
+function say(text) {
+  const p = h('p', {}, text);
+  const el = h('div', { class: 'say' }, h('span', { html: TIKA_SVG, style: 'display:contents' }), h('div', { class: 'bubble' }, p));
+  el.set = t => { p.textContent = t; };
+  return el;
+}
+function toast(text, ic = 'star') {
+  const t = h('div', { class: 'toast', role: 'status' }, icon(ic, ic === 'star'), text);
+  $('#toasts').append(t); setTimeout(() => t.remove(), 3600);
+}
+function burst(el) {
+  if (!S.settings.anim) return;
+  const b = h('span', { class: 'burst', 'aria-hidden': 'true' });
+  for (let i = 0; i < 6; i++) { const a = -Math.PI / 2 + (i - 2.5) * 0.45; const s = h('i'); s.style.setProperty('--dx', Math.cos(a) * 46 + 'px'); s.style.setProperty('--dy', Math.sin(a) * 46 + 'px'); b.append(s); }
+  el.append(b); setTimeout(() => b.remove(), 1100);
+}
+
+/* ===== REJESTR MODUŁÓW ===== */
+const Modules = [];
+function registerModule(m) {
+  m.qIndex = {}; m.questions.forEach(q => { m.qIndex[q.id] = q; });
+  Modules.push(m);
+}
+const curMod = () => Modules.find(m => m.id === S.modId) || Modules[0];
+const mKey = (mod, m) => mod.id + ':' + m.id;
+
+/* ===== POSTĘPY, ODZNAKI, POMYŁKI ===== */
+const doneCount = () => Object.keys(S.done).length;
+const totalStars = () => Object.values(S.stars).reduce((a, b) => a + b, 0);
+const BADGES = [
+  { id: 'pierwsza', name: 'Pierwsze drgnięcie', desc: 'Ukończ pierwszą misję', ic: 'leaf', test: () => doneCount() >= 1 },
+  { id: 'polowa', name: 'W połowie drogi', desc: 'Ukończ 3 misje', ic: 'map', test: () => doneCount() >= 3 },
+  { id: 'wszystkie', name: 'Mistrzyni drgań', desc: 'Ukończ wszystkie misje modułu', ic: 'trophy', test: () => { const m = curMod(); return m.missions.every(x => S.done[mKey(m, x)]); } },
+  { id: 'badaczka', name: 'Badaczka', desc: 'Zapisz 5 pomiarów w laboratoriach', ic: 'flask', test: () => S.measurements >= 5 },
+  { id: 'rezonans', name: 'Rytm huśtawki', desc: 'Rozhuśtaj huśtawkę dzięki rezonansowi', ic: 'swing', test: () => !!S.flags.rezonans },
+  { id: 'odwaga', name: 'Odwaga pytania', desc: 'Użyj „Pomocy!” i dokończ zadanie', ic: 'help', test: () => !!S.flags.odwaga },
+  { id: 'naprawiaczka', name: 'Naprawiaczka', desc: 'Popraw 5 dawnych pomyłek', ic: 'redo', test: () => S.fixed >= 5 },
+  { id: 'rachmistrzyni', name: 'Rachmistrzyni', desc: 'Rozwiąż dobrze 10 zadań rachunkowych', ic: 'pencil', test: () => S.calcOk >= 10 },
+  { id: 'kartkowka', name: 'Gotowa na kartkówkę', desc: 'Ukończ kartkówkę próbną', ic: 'clip', test: () => !!S.flags.kartkowka },
+  { id: 'sprawdzian', name: 'Gotowa na sprawdzian', desc: 'Ukończ sprawdzian próbny', ic: 'trophy', test: () => !!S.flags.sprawdzian },
+  { id: 'oddech', name: 'Chwila oddechu', desc: 'Zrób przerwę po misji', ic: 'heart', test: () => !!S.flags.przerwa },
+  { id: 'seria3', name: 'Trzy dni z fizyką', desc: 'Ucz się 3 dni z rzędu (jeden dzień przerwy nie psuje serii)', ic: 'flame', test: () => S.streak.best >= 3 },
+  { id: 'gwiazdy', name: 'Gwiezdny pył', desc: 'Zbierz 12 gwiazdek', ic: 'star', test: () => totalStars() >= 12 },
+  { id: 'wytrwalosc', name: 'Wytrwałość', desc: 'Rozwiąż 50 zadań – dobrze albo z pomocą', ic: 'bolt', test: () => S.answered >= 50 }
+];
+function checkBadges() {
+  for (const b of BADGES) if (!S.badges[b.id] && b.test()) { S.badges[b.id] = Date.now(); toast('Nowa odznaka: ' + b.name); Sound.play('badge'); }
+  for (const s of SKINS) if (s.cost > 0 && S.points >= s.cost && !S.skinsSeen[s.id]) { S.skinsSeen[s.id] = 1; toast('Nowa skórka wahadła: ' + s.name + ' (Kolekcja)', 'heart'); }
+  persist(); updateHUD();
+}
+function addMistake(q) {
+  const prev = S.mistakes[q.id];
+  S.mistakes[q.id] = { id: q.id, mod: curMod().id, concept: q.concept, mission: q.mission, text: q.title || q.q, box: 0, due: S.sessions + 1, n: (prev ? prev.n : 0) + 1 };
+}
+// Powtórki rozłożone w czasie: 2 poprawne odpowiedzi w kolejnych sesjach = pomyłka opanowana
+function progressMistake(id, ok) {
+  const m = S.mistakes[id]; if (!m) return;
+  if (!ok) { m.box = 0; m.due = S.sessions + 1; return; }
+  m.box++;
+  if (m.box >= 2) { delete S.mistakes[id]; S.fixed++; toast('Pomyłka opanowana – brawo!', 'check'); }
+  else m.due = S.sessions + 2;
+}
+function recordResult(r) {
+  S.points += r.points; S.answered++;
+  const q = r.q;
+  if (q.type === 'calc' && r.ok) S.calcOk++;
+  if (r.usedHelp) S.flags.odwaga = true;
+  if (q.forMistake && q.forMistake !== q.id) progressMistake(q.forMistake, r.ok);
+  if (S.mistakes[q.id]) progressMistake(q.id, r.ok);
+  else if (!r.ok) addMistake(q);
+  checkBadges();
+}
+const dueMistakes = mod => Object.values(S.mistakes).filter(m => m.mod === mod.id && m.due <= S.sessions);
+
+/* ===== DOBÓR ZADAŃ ===== */
+// Waga poziomu zadania zależnie od wybranej trudności (1 łatwy, 2 średni, 3 wyzwanie)
+const LEVEL_W = { 1: { 1: 3, 2: 1.2, 3: 0.15 }, 2: { 1: 1, 2: 3, 3: 1 }, 3: { 1: 0.3, 2: 1.2, 3: 3 } };
+function weightedPick(pool, n, diff, avoid = new Set()) {
+  const out = []; const cand = pool.filter(q => !avoid.has(q.id));
+  while (out.length < n && cand.length) {
+    const lastType = out.length ? out[out.length - 1].type : null;
+    const ws = cand.map(q => (LEVEL_W[diff][q.level] || 1) * (q.type === lastType ? 0.35 : 1));
+    let r = Math.random() * ws.reduce((a, b) => a + b, 0), i = 0;
+    while (i < ws.length - 1 && (r -= ws[i]) > 0) i++;
+    out.push(cand[i]); cand.splice(i, 1);
+  }
+  return out;
+}
+// Zamienia wpis z banku na konkretne zadanie (generator losuje nowe liczby)
+function mat(q, diff, extra) {
+  const base = q.gen ? Object.assign(q.gen(diff), { id: q.id, concept: q.concept, mission: q.mission, level: q.level, title: q.title }) : Object.assign({}, q);
+  return Object.assign(base, extra || {});
+}
+// Pomyłka wraca „w innej formie”: inne zadanie o tym samym pojęciu (najlepiej innego typu) albo nowe liczby
+function altFor(mod, m, diff) {
+  const q0 = mod.qIndex[m.id];
+  if (!q0) return null;
+  if (q0.gen) return mat(q0, diff, { forMistake: m.id });
+  const same = mod.questions.filter(q => q.concept === m.concept && q.id !== m.id && !S.mistakes[q.id]);
+  const other = same.filter(q => q.type !== q0.type);
+  const pick = other.length ? rnd(other) : same.length ? rnd(same) : q0;
+  return mat(pick, diff, { forMistake: m.id });
+}
+
+/* ===== 6. SILNIK ZADAŃ ===== */
+const TYPE_LABEL = { mc: 'Wybierz odpowiedź', tf: 'Prawda czy fałsz?', match: 'Dopasuj pary', slots: 'Przeciągnij klocki', click: 'Kliknij na rysunku', slider: 'Ustaw suwak', calc: 'Zadanie rachunkowe' };
+const OK_FIRST = ['Dokładnie tak!', 'Zgadza się.', 'Tak jest – dobrze kombinujesz.', 'Trafnie!', 'Świetnie!'];
+const OK_SECOND = ['Udało się za drugim razem – i o to chodzi!', 'Dobrze! Wskazówka zadziałała.', 'Jest! Poprawiłaś się sama.'];
+const TRY_AGAIN = ['Jeszcze nie.', 'Spróbujmy inaczej.', 'Hmm, jeszcze nie to.'];
+const QT = {};
+
+/* --- wybór jednej odpowiedzi (i prawda/fałsz) --- */
+QT.mc = {
+  render(q, body, api) {
+    const isTF = q.type === 'tf';
+    const list = (isTF ? ['Prawda', 'Fałsz'] : q.opts).map((t, i) => ({ t, i }));
+    const opts = isTF || q.keep ? list : shuffle(list);
+    const ans = isTF ? (q.answer ? 0 : 1) : 0; // w danych poprawna odpowiedź jest zawsze pierwsza
+    let sel = null;
+    const box = h('div', { class: 'opts' + (isTF ? ' tfrow' : ''), role: 'radiogroup', 'aria-label': 'Odpowiedzi' });
+    const btns = opts.map((o, k) => { const b = h('button', { class: 'opt', type: 'button', role: 'radio', 'aria-checked': 'false', onclick: () => choose(o.i) }, h('span', { class: 'optkey', 'aria-hidden': 'true' }, String(k + 1)), h('span', {}, o.t)); b.dataset.i = o.i; return b; });
+    box.append(...btns); body.append(box);
+    const byI = i => btns.find(x => +x.dataset.i === i);
+    function choose(i) {
+      const b = byI(i); if (!b || b.disabled) return;
+      sel = i; btns.forEach(x => { const on = x === b; x.classList.toggle('sel', on); x.setAttribute('aria-checked', String(on)); });
+      api.ready(true); Sound.play('tap');
+    }
+    return {
+      check: () => ({ ok: sel === ans }),
+      retry() { const b = byI(sel); if (b) { b.classList.remove('sel'); b.classList.add('tried'); b.disabled = true; b.setAttribute('aria-checked', 'false'); } sel = null; api.ready(false); },
+      reveal() { btns.forEach(x => { x.disabled = true; if (+x.dataset.i === ans) x.classList.add('right'); }); },
+      key(n) { const b = btns[n - 1]; if (b) choose(+b.dataset.i); }
+    };
+  }
+};
+QT.tf = QT.mc;
+
+/* --- dopasowywanie par --- */
+QT.match = {
+  render(q, body, api) {
+    const n = q.pairs.length, pair = {}; let sel = null, locked = false;
+    const colors = ['--primary', '--accent', '--lilac', '--rose', '--ok'];
+    const lb = q.pairs.map((p, i) => h('button', { class: 'mitem', type: 'button', onclick: () => tap('L', i) }, p[0]));
+    const rb = shuffle(q.pairs.map((p, i) => i)).map(i => { const b = h('button', { class: 'mitem', type: 'button', onclick: () => tap('R', i) }, q.pairs[i][1]); b.dataset.i = i; return b; });
+    const rbtn = i => rb.find(b => +b.dataset.i === i);
+    body.append(h('p', { class: 'note' }, 'Kliknij pojęcie po lewej, a potem pasujący opis po prawej. Kliknij parę jeszcze raz, by ją rozłączyć.'),
+      h('div', { class: 'match' }, h('div', { class: 'mcol' }, lb), h('div', { class: 'mcol' }, rb)));
+    const leftOf = ri => { for (const k in pair) if (pair[k] === ri) return +k; return -1; };
+    function paint() {
+      [...lb, ...rb].forEach(b => { b.removeAttribute('data-n'); b.style.removeProperty('--pc'); b.classList.remove('sel'); });
+      if (sel) (sel.s === 'L' ? lb[sel.i] : rbtn(sel.i)).classList.add('sel');
+      let k = 0;
+      for (const li in pair) { k++; const c = `var(${colors[(k - 1) % colors.length]})`; [lb[li], rbtn(pair[li])].forEach(b => { b.dataset.n = k; b.style.setProperty('--pc', c); }); }
+      api.ready(Object.keys(pair).length === n);
+    }
+    function tap(side, i) {
+      if (locked) return; Sound.play('tap');
+      const li0 = side === 'L' ? (pair[i] !== undefined ? i : -1) : leftOf(i);
+      if (li0 >= 0 && !(sel && sel.s !== side)) { delete pair[li0]; sel = null; paint(); return; }
+      if (!sel || sel.s === side) { sel = (sel && sel.s === side && sel.i === i) ? null : { s: side, i }; paint(); return; }
+      const li = side === 'L' ? i : sel.i, ri = side === 'R' ? i : sel.i;
+      delete pair[li]; const old = leftOf(ri); if (old >= 0) delete pair[old];
+      pair[li] = ri; sel = null; paint();
+    }
+    return {
+      check: () => ({ ok: q.pairs.every((p, i) => pair[i] === i) }),
+      retry() {
+        for (const li in pair) if (pair[li] !== +li) { const a = lb[li], b = rbtn(pair[li]); [a, b].forEach(x => { x.classList.add('bad'); setTimeout(() => x.classList.remove('bad'), 1500); }); delete pair[li]; }
+        paint();
+      },
+      reveal() { q.pairs.forEach((p, i) => { pair[i] = i; }); sel = null; paint(); locked = true; [...lb, ...rb].forEach(b => b.disabled = true); }
+    };
+  }
+};
+
+/* --- przeciągane klocki: luki w tekście i kreator wzorów --- */
+function dragChip(chip, area, onDrop, onTap) {
+  let st = null, ghost = null, suppress = false, over = null;
+  chip.addEventListener('pointerdown', e => { if (e.button > 0 || chip.disabled) return; st = { x: e.clientX, y: e.clientY, id: e.pointerId }; });
+  chip.addEventListener('pointermove', e => {
+    if (!st || e.pointerId !== st.id) return;
+    if (!ghost && Math.hypot(e.clientX - st.x, e.clientY - st.y) > 8) {
+      ghost = chip.cloneNode(true); ghost.classList.add('ghost'); document.body.append(ghost); chip.classList.add('dragging');
+      try { chip.setPointerCapture(e.pointerId); } catch (_) { }
+    }
+    if (ghost) {
+      ghost.style.left = e.clientX + 'px'; ghost.style.top = e.clientY + 'px';
+      const t = document.elementFromPoint(e.clientX, e.clientY), s = t && t.closest('.slot');
+      if (over && over !== s) over.classList.remove('hover');
+      over = s && area.contains(s) ? s : null; if (over) over.classList.add('hover');
+    }
+  });
+  const end = e => {
+    if (!st) return;
+    if (ghost) {
+      ghost.remove(); ghost = null; chip.classList.remove('dragging'); if (over) over.classList.remove('hover');
+      const t = document.elementFromPoint(e.clientX, e.clientY), s = t && t.closest('.slot');
+      if (s && area.contains(s)) onDrop(s);
+      suppress = true; setTimeout(() => { suppress = false; }, 80);
+    }
+    st = null; over = null;
+  };
+  chip.addEventListener('pointerup', end);
+  chip.addEventListener('pointercancel', () => { if (ghost) ghost.remove(); ghost = null; st = null; chip.classList.remove('dragging'); });
+  chip.addEventListener('click', () => { if (suppress) { suppress = false; return; } onTap(); });
+}
+QT.slots = {
+  render(q, body, api) {
+    const wrap = h('div', { class: 'slots' + (q.formula ? ' formula' : '') });
+    const line = h('p', { class: 'slot-line' });
+    const acc = i => [].concat(q.answers[i]);
+    const slots = []; let locked = false, focusSlot = null;
+    q.template.split(/\[\[(\d+)\]\]/).forEach((p, i) => {
+      if (i % 2 === 0) { if (p) line.append(p); return; }
+      const s = h('button', { class: 'slot', type: 'button', 'aria-label': 'Puste miejsce ' + (+p + 1) });
+      s.dataset.idx = p; s.chip = null; slots[+p] = s; line.append(s);
+      s.addEventListener('click', () => { if (locked) return; if (s.chip) unplace(s); else { focusSlot = s; slots.forEach(x => x.classList.toggle('hover', x === s)); } });
+    });
+    const words = shuffle(q.answers.map(a => [].concat(a)[0]).concat(q.extra || []));
+    const bank = h('div', { class: 'bank', 'aria-label': 'Klocki do wyboru' });
+    const chips = words.map(w => { const c = h('button', { class: 'chip', type: 'button' }, w); dragChip(c, wrap, s => place(c, s), () => tapChip(c)); return c; });
+    bank.append(...chips);
+    wrap.append(line); body.append(h('p', { class: 'note' }, 'Przeciągnij klocek na puste miejsce albo kliknij klocek, a trafi w pierwsze wolne miejsce.'), wrap, bank);
+    function place(chip, s) {
+      if (locked) return;
+      if (s.chip) unplace(s);
+      s.chip = chip; s.textContent = chip.textContent; s.classList.add('filled'); s.classList.remove('bad', 'hover'); chip.hidden = true;
+      s.setAttribute('aria-label', 'Miejsce ' + (+s.dataset.idx + 1) + ': ' + chip.textContent + '. Kliknij, aby zabrać klocek.');
+      focusSlot = null; Sound.play('tap'); update();
+    }
+    function unplace(s) { if (!s.chip) return; s.chip.hidden = false; s.chip = null; s.textContent = ''; s.classList.remove('filled'); s.setAttribute('aria-label', 'Puste miejsce ' + (+s.dataset.idx + 1)); update(); }
+    function tapChip(c) { const s = (focusSlot && !focusSlot.chip) ? focusSlot : slots.find(x => !x.chip); if (s) place(c, s); }
+    const update = () => api.ready(slots.every(s => s.chip));
+    const okAt = i => slots[i].chip && acc(i).includes(slots[i].chip.textContent);
+    return {
+      check: () => ({ ok: slots.every((s, i) => okAt(i)) }),
+      retry() { slots.forEach((s, i) => { if (!okAt(i)) { unplace(s); s.classList.add('bad'); } }); },
+      reveal() { locked = true; slots.forEach((s, i) => { s.textContent = acc(i)[0]; s.classList.add('revealed'); s.disabled = true; }); chips.forEach(c => { c.disabled = true; }); bank.hidden = true; }
+    };
+  }
+};
+
+/* --- kliknij na rysunku/wykresie --- */
+QT.click = {
+  render(q, body, api) {
+    const wrap = h('div', { class: 'svgwrap', html: q.svg }); body.append(wrap);
+    const hots = [...wrap.querySelectorAll('[data-hot]')]; let sel = null, locked = false;
+    hots.forEach(g => {
+      g.setAttribute('tabindex', '0'); g.setAttribute('role', 'button'); g.setAttribute('aria-label', g.dataset.label || g.dataset.hot); g.classList.add('hot');
+      const act = () => { if (locked || g.classList.contains('tried')) return; sel = g.dataset.hot; hots.forEach(x => x.classList.toggle('sel', x === g)); api.ready(true); Sound.play('tap'); };
+      g.addEventListener('click', act);
+      g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); act(); } });
+    });
+    return {
+      check: () => ({ ok: q.correct.includes(sel) }),
+      retry() { const g = hots.find(x => x.dataset.hot === sel); if (g) { g.classList.remove('sel'); g.classList.add('tried'); } sel = null; api.ready(false); },
+      reveal() { locked = true; hots.forEach(x => { x.classList.remove('sel'); if (q.correct.includes(x.dataset.hot)) x.classList.add('right'); }); }
+    };
+  }
+};
+
+/* --- ustaw suwak tak, aby... (z żywą symulacją) --- */
+let uid = 0;
+QT.slider = {
+  render(q, body, api) {
+    const cv = h('canvas', { class: 'sim', role: 'img', 'aria-label': q.label });
+    const sim = SIMS[q.sim](cv, q);
+    const id = 'sl' + (++uid);
+    const out = h('output', { class: 'readout', for: id });
+    const inp = h('input', { type: 'range', id, min: q.min, max: q.max, step: q.step, value: q.init });
+    const upd = () => { const v = +inp.value; sim.set(v); out.textContent = sim.readout(v); };
+    inp.addEventListener('input', () => { upd(); api.ready(true); });
+    upd();
+    body.append(cv, h('label', { class: 'lbl', for: id }, q.label), inp, out);
+    return {
+      check: () => { const v = +inp.value; return { ok: q.check(v), msg: q.hintFn ? q.hintFn(v) : null }; },
+      retry() { api.ready(false); },
+      reveal() { inp.value = q.target; upd(); inp.disabled = true; }
+    };
+  }
+};
+
+/* --- zadanie rachunkowe: dane, szukane, wzór, wynik, jednostka --- */
+const UNITS = ['s', 'Hz', 'm', 'bez jednostki'];
+QT.calc = {
+  render(q, body, api) {
+    const id = 'calc' + (++uid);
+    let fi = null, unit = null, locked = false;
+    const dl = h('dl', { class: 'calc-data' });
+    q.data.forEach(d => dl.append(h('dt', {}, d[0]), h('dd', {}, d[1])));
+    dl.append(h('dt', {}, 'Szukane'), h('dd', {}, q.find + ' = ?'));
+    const fOrder = shuffle(q.formulas.map((f, i) => i));
+    const fBtns = fOrder.map(i => { const b = h('button', { class: 'choice', type: 'button', role: 'radio', 'aria-checked': 'false', onclick: () => { if (locked) return; fi = i; paint(); } }, q.formulas[i]); b.dataset.i = i; return b; });
+    const inp = h('input', { class: 'numin', id, type: 'text', inputmode: 'decimal', autocomplete: 'off', placeholder: 'np. 0,5' });
+    inp.addEventListener('input', () => { inp.classList.remove('okv'); paint(); });
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); api.submit(); } });
+    const uBtns = UNITS.map(u => { const b = h('button', { class: 'choice', type: 'button', role: 'radio', 'aria-checked': 'false', onclick: () => { if (locked) return; unit = u; paint(); } }, u); b.dataset.u = u; return b; });
+    function paint() {
+      fBtns.forEach(b => b.setAttribute('aria-checked', String(+b.dataset.i === fi)));
+      uBtns.forEach(b => b.setAttribute('aria-checked', String(b.dataset.u === unit)));
+      api.ready(fi !== null && inp.value.trim() !== '' && unit !== null);
+    }
+    body.append(dl,
+      h('div', { class: 'stack' }, h('p', { class: 'lbl' }, '1. Wybierz wzór'), h('div', { class: 'row wrap', role: 'radiogroup', 'aria-label': 'Wzór' }, fBtns)),
+      h('div', { class: 'stack' }, h('label', { class: 'lbl', for: id }, '2. Wpisz wynik ' + q.find + ' ='), inp),
+      h('div', { class: 'stack' }, h('p', { class: 'lbl' }, '3. Wybierz jednostkę'), h('div', { class: 'row wrap', role: 'radiogroup', 'aria-label': 'Jednostka' }, uBtns)));
+    const tol = Math.abs(q.answer) * 0.02 + 1e-9;
+    let last = {};
+    return {
+      check() {
+        const v = parseNum(inp.value);
+        last = { f: fi === q.fIdx, n: Math.abs(v - q.answer) <= tol, u: unit === q.unit };
+        const ok = last.f && last.n && last.u;
+        let msg = null;
+        if (!last.f) msg = 'Sprawdź wzór. ' + q.hint;
+        else if (!last.n) msg = 'Wzór jest dobry! Sprawdź obliczenia. ' + (q.hintCalc || '');
+        else if (!last.u) msg = 'Liczba jest dobra! Zastanów się nad jednostką: czego szukasz?';
+        return { ok, msg };
+      },
+      retry() { if (!last.f) fi = null; if (!last.n) inp.value = ''; else inp.classList.add('okv'); if (!last.u) unit = null; paint(); },
+      reveal() {
+        locked = true; fi = q.fIdx; unit = q.unit; inp.value = fmt(q.answer, 4); inp.disabled = true; paint();
+        fBtns.forEach(b => { b.disabled = true; if (+b.dataset.i === q.fIdx) b.classList.add('right'); });
+        uBtns.forEach(b => { b.disabled = true; if (b.dataset.u === q.unit) b.classList.add('right'); });
+      }
+    };
+  }
+};
+
+/* --- przebieg jednego zadania: sprawdź → wskazówka → druga szansa → wyjaśnienie --- */
+function levelDots(l) { const d = h('span', { class: 'dots', 'aria-label': `Poziom ${l} z 3` }); for (let i = 1; i <= 3; i++) d.append(h('i', { class: i <= l ? 'on' : '' })); return d; }
+function runQuestion(host, q, o) {
+  const maxTries = q.type === 'tf' ? 1 : 2;
+  let tries = 0, help = 0, done = false;
+  const card = h('article', { class: 'card qcard' });
+  const title = h('h2', { class: 'qtext', tabindex: '-1' }, q.q);
+  const body = h('div', { class: 'qbody' });
+  const helpBox = h('div', { class: 'helpbox', hidden: true, 'aria-live': 'polite' });
+  const fb = h('div', { class: 'feedback', 'aria-live': 'polite' });
+  const helpLabel = document.createTextNode('Pomocy!');
+  const bHelp = h('button', { class: 'btn ghost', type: 'button', onclick: doHelp }, icon('help'), helpLabel);
+  const bCheck = h('button', { class: 'btn primary', type: 'button', disabled: true, onclick: doCheck }, 'Sprawdź');
+  const actions = h('div', { class: 'qactions' }, bHelp, bCheck);
+  card.append(h('div', { class: 'qmeta' }, h('span', { class: 'tag' }, TYPE_LABEL[q.type] || ''), o.label ? h('span', {}, o.label) : null, levelDots(q.level || 1)), title, body, helpBox, fb, actions);
+  host.append(card);
+  const R = QT[q.type].render(q, body, { ready: v => { if (!done) bCheck.disabled = !v; }, submit: () => doCheck() });
+  try { title.focus({ preventScroll: true }); } catch (e) { }
+  const offKey = onKey(e => { if (done || isTyping(e)) return; if (/^[1-9]$/.test(e.key) && R.key) R.key(+e.key); }, card);
+
+  function doHelp() {
+    help++; helpBox.hidden = false; helpBox.innerHTML = '';
+    helpBox.append(h('p', { class: 'hb-t' }, 'Podpowiedź'), h('p', {}, q.hint || 'Przeczytaj pytanie jeszcze raz, powoli.'));
+    if (help >= 2) {
+      helpBox.append(h('p', { class: 'hb-t' }, 'Krok po kroku'), h('ol', {}, (q.steps || [q.expl]).map(s => h('li', {}, s))));
+      bHelp.disabled = true;
+    } else helpLabel.textContent = 'Więcej pomocy';
+  }
+  function doCheck() {
+    if (done || bCheck.disabled) return;
+    tries++;
+    const res = R.check();
+    if (res.ok) return finish(true);
+    if (tries < maxTries) {
+      fb.className = 'feedback fb-hint'; fb.innerHTML = '';
+      fb.append(h('p', { class: 'fb-t' }, rnd(TRY_AGAIN)), h('p', {}, res.msg || q.hint || 'Przyjrzyj się jeszcze raz.'), h('p', { class: 'small muted' }, 'Masz drugą szansę – bez utraty punktów za pomoc.'));
+      R.retry(); return;
+    }
+    finish(false);
+  }
+  function finish(ok) {
+    done = true; offKey(); R.reveal();
+    const pts = ok ? (tries === 1 ? 10 : 6) : 2;
+    bCheck.remove(); bHelp.disabled = true;
+    fb.className = 'feedback ' + (ok ? 'fb-ok' : 'fb-learn'); fb.innerHTML = '';
+    if (ok) {
+      fb.append(h('p', { class: 'fb-t' }, q.ok || rnd(tries === 1 ? OK_FIRST : OK_SECOND)), q.expl ? h('p', {}, h('b', {}, 'Dlaczego? '), q.expl) : null, h('p', { class: 'pts' }, `+${pts} pkt`));
+      burst(card); Sound.play('ok');
+    } else {
+      fb.append(h('p', { class: 'fb-t' }, tries > 1 ? 'To było trudne. Zobacz, jak to działa:' : 'Nie tym razem. Zobacz, jak to działa:'), h('p', {}, q.expl),
+        q.anim ? miniAnim(q.anim) : null,
+        h('p', { class: 'small' }, 'Poprawna odpowiedź jest zaznaczona na zielono. To zadanie wróci później w innej formie.'), h('p', { class: 'pts' }, `+${pts} pkt za wysiłek`));
+    }
+    const result = { q, ok, firstTry: ok && tries === 1, usedHelp: help > 0, points: pts };
+    recordResult(result);
+    const bNext = h('button', { class: 'btn primary', type: 'button', onclick: () => o.onNext(result) }, o.nextLabel || 'Dalej');
+    actions.append(bNext);
+    try { bNext.focus({ preventScroll: true }); } catch (e) { }
+    if (fb.scrollIntoView) fb.scrollIntoView({ block: 'nearest', behavior: S.settings.anim ? 'smooth' : 'auto' });
+  }
+}
+
+/* ===== RYSUNKI SVG DO ZADAŃ „KLIKNIJ” ===== */
+const SV = {
+  arrowPath(x1, y1, x2, y2, col, w = 4) {
+    const a = Math.atan2(y2 - y1, x2 - x1), s = 9;
+    const hd = (x, y, an) => `M${x} ${y}L${(x - s * Math.cos(an - .45)).toFixed(1)} ${(y - s * Math.sin(an - .45)).toFixed(1)}M${x} ${y}L${(x - s * Math.cos(an + .45)).toFixed(1)} ${(y - s * Math.sin(an + .45)).toFixed(1)}`;
+    return `<path class="hot-shape" d="M${x1} ${y1}L${x2} ${y2}${hd(x2, y2, a)}${hd(x1, y1, a + Math.PI)}" style="fill:none;stroke:${col};stroke-width:${w};stroke-linecap:round"/>`;
+  },
+  hit: (x1, y1, x2, y2) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="stroke:transparent;stroke-width:28"/>`,
+  badge: (x, y, t) => `<circle cx="${x}" cy="${y}" r="13" style="fill:var(--surface);stroke:var(--ink);stroke-width:2"/><text x="${x}" y="${y + 5}" text-anchor="middle" class="svg-lbl">${t}</text>`,
+  dashed: (x1, y1, x2, y2) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="stroke:var(--muted);stroke-width:1.5;stroke-dasharray:4 5"/>`,
+  // Wahadło w trzech położeniach A, O, B
+  positions() {
+    const px = 160, py = 26, L = 150, yE = py + L * Math.sqrt(.75);
+    let s = `<svg viewBox="0 0 320 240" class="qsvg" role="group" aria-label="Wahadło narysowane w trzech położeniach A, O i B"><rect x="115" y="14" width="90" height="10" rx="3" style="fill:var(--line)"/>`;
+    s += `<path d="M${px - 75} ${yE.toFixed(1)}A${L} ${L} 0 0 0 ${px + 75} ${yE.toFixed(1)}" style="fill:none;stroke:var(--muted);stroke-width:2;stroke-dasharray:4 6"/>`;
+    [['A', -.5], ['O', 0], ['B', .5]].forEach(([id, sn]) => {
+      const x = px + L * sn, y = (py + L * Math.sqrt(1 - sn * sn)).toFixed(1);
+      s += `<g data-hot="${id}" data-label="Punkt ${id}"><line x1="${px}" y1="${py}" x2="${x}" y2="${y}" style="stroke:var(--muted);stroke-width:2${id === 'O' ? '' : ';stroke-dasharray:5 5'}"/><circle class="hot-shape" cx="${x}" cy="${y}" r="20" style="fill:var(--accent);stroke:var(--surface);stroke-width:3"/><text x="${x}" y="${+y + 44}" text-anchor="middle" class="svg-lbl">${id}</text></g>`;
+    });
+    return s + '</svg>';
+  },
+  // Trzy strzałki: amplituda, dwie amplitudy, długość nici
+  swingArrows() {
+    const px = 160, py = 22, L = 120, xl = 100, xr = 220, ye = 126, yo = 142;
+    let s = `<svg viewBox="0 0 320 250" class="qsvg" role="group" aria-label="Wahadło i trzy ponumerowane strzałki"><rect x="120" y="10" width="80" height="10" rx="3" style="fill:var(--line)"/>`;
+    s += `<line x1="${px}" y1="${py}" x2="${xl}" y2="${ye}" style="stroke:var(--muted);stroke-width:2;stroke-dasharray:5 5"/><line x1="${px}" y1="${py}" x2="${xr}" y2="${ye}" style="stroke:var(--muted);stroke-width:2;stroke-dasharray:5 5"/><line x1="${px}" y1="${py}" x2="${px}" y2="${yo}" style="stroke:var(--ink);stroke-width:2"/>`;
+    s += `<circle cx="${xl}" cy="${ye}" r="13" style="fill:var(--accent);opacity:.45"/><circle cx="${xr}" cy="${ye}" r="13" style="fill:var(--accent);opacity:.45"/><circle cx="${px}" cy="${yo}" r="14" style="fill:var(--accent)"/>`;
+    s += SV.dashed(px, yo + 14, px, 236) + SV.dashed(xl, ye + 13, xl, 236) + SV.dashed(xr, ye + 13, xr, 236);
+    s += `<g data-hot="a1" data-label="Strzałka 1">${SV.hit(px, 182, xr, 182)}${SV.arrowPath(px + 3, 182, xr - 3, 182, 'var(--primary)')}${SV.badge(190, 164, 1)}</g>`;
+    s += `<g data-hot="a2" data-label="Strzałka 2">${SV.hit(xl, 224, xr, 224)}${SV.arrowPath(xl + 3, 224, xr - 3, 224, 'var(--lilac)')}${SV.badge(130, 206, 2)}</g>`;
+    s += `<g data-hot="a3" data-label="Strzałka 3">${SV.hit(132, py + 6, 132, yo - 6)}${SV.arrowPath(132, py + 6, 132, yo - 6, 'var(--rose)')}${SV.badge(112, 80, 3)}</g>`;
+    return s + '</svg>';
+  },
+  wave(x0, y0, A, Tp, len, mode) {
+    let d = '';
+    for (let i = 0; i <= len; i += 2) {
+      let a = A; if (mode === 'decay') a = A * Math.exp(-i * 0.011); if (mode === 'grow') a = A * Math.min(1, 0.2 + i * 0.0035);
+      d += (i ? 'L' : 'M') + (x0 + i) + ' ' + (y0 - a * Math.cos(2 * Math.PI * i / Tp)).toFixed(1);
+    }
+    return `<path d="${d}" style="fill:none;stroke:var(--primary);stroke-width:3;stroke-linejoin:round"/>`;
+  },
+  axes(x0, y0, w, top, bottom) {
+    return `<line x1="${x0}" y1="${y0}" x2="${x0 + w}" y2="${y0}" style="stroke:var(--ink);stroke-width:1.5"/><line x1="${x0}" y1="${bottom}" x2="${x0}" y2="${top}" style="stroke:var(--ink);stroke-width:1.5"/>` +
+      `<text x="${x0 - 12}" y="${top + 6}" text-anchor="middle" class="svg-lbl">x</text><text x="${x0 + w + 8}" y="${y0 + 18}" text-anchor="middle" class="svg-lbl">t</text>`;
+  },
+  // Wykres x(t) ze strzałkami: amplituda / 2A / okres
+  graphAmp() {
+    let s = `<svg viewBox="0 0 320 210" class="qsvg" role="group" aria-label="Wykres wychylenia od czasu z trzema strzałkami">` + SV.axes(40, 125, 262, 28, 200) + SV.wave(40, 125, 60, 100, 260);
+    s += SV.dashed(240, 65, 284, 65) + SV.dashed(190, 185, 284, 185);
+    s += `<g data-hot="a1" data-label="Strzałka 1">${SV.hit(140, 122, 140, 68)}${SV.arrowPath(140, 122, 140, 68, 'var(--accent)')}${SV.badge(160, 100, 1)}</g>`;
+    s += `<g data-hot="a2" data-label="Strzałka 2">${SV.hit(278, 182, 278, 68)}${SV.arrowPath(278, 182, 278, 68, 'var(--lilac)')}${SV.badge(300, 150, 2)}</g>`;
+    s += `<g data-hot="a3" data-label="Strzałka 3">${SV.hit(143, 46, 237, 46)}${SV.arrowPath(143, 46, 237, 46, 'var(--rose)')}${SV.badge(190, 30, 3)}</g>`;
+    return s + '</svg>';
+  },
+  // Wykres x(t) z trzema przedziałami czasu: T/2, T, 2T
+  graphPeriod() {
+    const br = (x1, x2, y, up, col) => `<path class="hot-shape" d="M${x1} ${y + (up ? 9 : -9)}V${y}H${x2}V${y + (up ? 9 : -9)}" style="fill:none;stroke:${col};stroke-width:4;stroke-linecap:round;stroke-linejoin:round"/>`;
+    let s = `<svg viewBox="0 0 320 236" class="qsvg" role="group" aria-label="Wykres wychylenia od czasu z trzema zaznaczonymi przedziałami">` + SV.axes(40, 125, 262, 28, 200) + SV.wave(40, 125, 55, 100, 260);
+    s += SV.dashed(140, 70, 140, 30) + SV.dashed(240, 70, 240, 30) + SV.dashed(90, 180, 90, 52);
+    s += `<g data-hot="s1" data-label="Przedział 1">${SV.hit(40, 52, 90, 52)}${br(40, 90, 52, true, 'var(--lilac)')}${SV.badge(65, 36, 1)}</g>`;
+    s += `<g data-hot="s2" data-label="Przedział 2">${SV.hit(140, 30, 240, 30)}${br(140, 240, 30, true, 'var(--accent)')}${SV.badge(190, 16, 2)}</g>`;
+    s += `<g data-hot="s3" data-label="Przedział 3">${SV.hit(40, 214, 240, 214)}${br(40, 240, 214, false, 'var(--rose)')}${SV.badge(140, 224, 3)}</g>`;
+    return s + '</svg>';
+  },
+  // Trzy małe wykresy: drgania stałe, tłumione, narastające
+  graphsDamped() {
+    let s = `<svg viewBox="0 0 320 270" class="qsvg" role="group" aria-label="Trzy wykresy drgań oznaczone A, B i C">`;
+    [['A', 'flat'], ['B', 'decay'], ['C', 'grow']].forEach(([id, mode], k) => {
+      const y = 8 + k * 88;
+      s += `<g data-hot="${id}" data-label="Wykres ${id}"><rect class="hot-shape" x="6" y="${y}" width="308" height="78" rx="12" style="fill:var(--surface);stroke:var(--line);stroke-width:2"/>` +
+        `<text x="26" y="${y + 45}" text-anchor="middle" class="svg-lbl">${id}</text>` + `<line x1="48" y1="${y + 39}" x2="304" y2="${y + 39}" style="stroke:var(--line);stroke-width:1"/>` + SV.wave(50, y + 39, 30, 42, 250, mode) + `</g>`;
+    });
+    return s + '</svg>';
+  }
+};
+
+/* ===== SYMULACJE (oparte na wzorach fizycznych, nie „na oko”) =====
+   Wahadło matematyczne: T = 2π·√(l/g)  (dla małych wychyleń)
+   Ciężarek na sprężynie: T = 2π·√(m/k)
+   Wzory służą do animacji; uczeń poznaje zależności jakościowo, zgodnie z podstawą programową. */
+const periodPendulum = L => 2 * Math.PI * Math.sqrt(L / G);
+const periodSpring = (m, k) => 2 * Math.PI * Math.sqrt(m / k);
+const animOn = () => S.settings.anim;
+
+// Symulacje dla zadań typu „ustaw suwak”
+const SIMS = {
+  pendulumL(cv, q) {
+    let L = q.init, ph = 0;
+    Loop.add(dt => {
+      ph += dt * 2 * Math.PI / periodPendulum(L) * (animOn() ? 1 : 0);
+      const { ctx, w, h: H } = fit(cv), px = w / 2, py = 24;
+      drawCeiling(ctx, px, py, 130);
+      drawPendulum(ctx, px, py, 20 + (H - 62) * (L / q.max), 0.26 * Math.cos(ph), 13);
+    }, cv);
+    return { set(v) { L = v; }, readout: v => `Długość: ${fmt(v, 2)} m  ·  Okres: ${fmt(periodPendulum(v), 2)} s` };
+  },
+  springM(cv, q) {
+    const k = q.k; let m = q.init, ph = 0;
+    Loop.add(dt => {
+      ph += dt * 2 * Math.PI / periodSpring(m, k) * (animOn() ? 1 : 0);
+      const { ctx, w, h: H } = fit(cv); drawSpringScene(ctx, w, H, m, k, Math.cos(ph));
+    }, cv);
+    return { set(v) { m = v; }, readout: v => `Masa: ${fmt(v, 2)} kg  ·  Okres: ${fmt(periodSpring(v, k), 2)} s` };
+  },
+  // Huśtawka pchana w zadanym rytmie: amplituda drgań wymuszonych (stan ustalony)
+  driven(cv, q) {
+    let f = q.init, A = 0.05, t = 0;
+    const w0 = 2 * Math.PI * 0.5, beta = 0.12, F = 0.452;
+    Loop.add(dt => {
+      if (animOn()) t += dt;
+      const w = 2 * Math.PI * f;
+      const target = Math.min(0.75, F / Math.sqrt((w0 * w0 - w * w) ** 2 + (2 * beta * w) ** 2));
+      A += (target - A) * Math.min(1, dt * 0.9);
+      const { ctx, w: W, h: H } = fit(cv), px = W / 2, py = 26, len = H - 96;
+      const th = A * Math.cos(w * t);
+      const seat = drawSwing(ctx, px, py, len, th, H - 40);
+      if (Math.cos(w * t) < -0.93) arrow(ctx, seat.x - 50, seat.y, seat.x - 30, seat.y, COL.accent, false, 4);
+      // miernik wychylenia
+      const bw = Math.min(260, W - 40), bx = (W - bw) / 2, by = H - 22;
+      ctx.fillStyle = COL.surface; rr(ctx, bx, by, bw, 10, 5); ctx.fill(); ctx.strokeStyle = COL.line; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = COL.accent; rr(ctx, bx, by, Math.max(10, bw * A / 0.75), 10, 5); ctx.fill();
+      txt(ctx, 'wychylenie huśtawki', W / 2, by - 10, { size: 12, color: COL.muted, weight: 400 });
+    }, cv);
+    return { set(v) { f = v; }, readout: v => `Rytm pchania: ${fmt(v, 2)} Hz (pchnięcie co ${fmt(1 / v, 2)} s)` };
+  }
+};
+// Scena: sprężyna z ciężarkiem; pos = cos(faza) w zakresie −1..1
+function drawSpringScene(ctx, w, H, m, k, pos, opts = {}) {
+  const px = w / 2, top = 22;
+  drawCeiling(ctx, px, top, 120);
+  const rest = H * 0.17, stretch = Math.min(1, m * G / k) * H * 0.3, A = H * 0.07;
+  const yEq = top + rest + stretch, y = yEq + A * pos;
+  const bs = H * 0.07 + H * 0.06 * m;
+  drawSpring(ctx, px, top, y, 11, 15);
+  ctx.fillStyle = COL.primary; rr(ctx, px - bs * 0.7, y, bs * 1.4, bs, 6); ctx.fill();
+  txt(ctx, fmt(m, 2) + ' kg', px, y + bs / 2, { size: 12, color: COL.surface });
+  if (opts.eq !== false) { dash(ctx, px - 90, yEq + bs / 2, px + 90, yEq + bs / 2, COL.muted, 1.5); txt(ctx, 'położenie równowagi', px + 92, yEq + bs / 2, { size: 12, align: 'left', color: COL.muted, weight: 400 }); }
+}
+
+/* ----- Małe animacje do wstępów i wyjaśnień ----- */
+const MINI = {
+  swing(ctx, w, H, t, labels) {
+    const px = w / 2, py = 24, len = H - 84, T = periodPendulum(2.2), th0 = 0.42, th = th0 * Math.cos(2 * Math.PI * t / T);
+    const seat = drawSwing(ctx, px, py, len, th, H - 22);
+    if (labels) {
+      const ax = py + len + 28, xr = px + len * Math.sin(th0);
+      dash(ctx, px, py, px, ax + 6, COL.muted); dash(ctx, xr, py + len * Math.cos(th0), xr, ax + 6, COL.lilac);
+      arrow(ctx, px, ax, xr, ax, COL.lilac, true); txt(ctx, 'A', (px + xr) / 2, ax - 10, { color: COL.lilac });
+      txt(ctx, 'O', px - 12, ax, {});
+      arrow(ctx, px, seat.y + 18, seat.x, seat.y + 18, COL.accent, false, 2);
+    }
+  },
+  swinglabels(ctx, w, H, t) { MINI.swing(ctx, w, H, t, true); },
+  clock(ctx, w, H, t) {
+    const T = 1.5, L = G * (T / 2 / Math.PI) ** 2, px = w / 2, py = 26;
+    ctx.strokeStyle = COL.line; ctx.lineWidth = 3; rr(ctx, px - 70, 12, 140, H - 24, 16); ctx.stroke();
+    drawPendulum(ctx, px, py, H - 80, 0.3 * Math.cos(2 * Math.PI * t / T), 14);
+    txt(ctx, `drgania: ${Math.floor(t / T)}`, px + 80, 30, { align: 'left', size: 14 });
+    txt(ctx, `t = ${fmt(t % 100, 1)} s`, px + 80, 52, { align: 'left', size: 14, weight: 400 });
+    txt(ctx, 'T = 1,5 s', px - 80, 30, { align: 'right', size: 14, color: COL.primary });
+  },
+  lab(ctx, w, H, t) {
+    [[w * 0.3, 0.25, 'krótkie'], [w * 0.7, 1.0, 'długie']].forEach(([px, L, lab]) => {
+      const T = periodPendulum(L), len = 20 + (H - 70) * L;
+      drawCeiling(ctx, px, 24, 70);
+      drawPendulum(ctx, px, 24, len, 0.28 * Math.cos(2 * Math.PI * t / T), 11);
+      txt(ctx, `${lab}: T = ${fmt(T, 1)} s`, px, H - 14, { size: 13 });
+    });
+  },
+  spring(ctx, w, H, t) { drawSpringScene(ctx, w, H, 0.5, 15, Math.cos(2 * Math.PI * t / periodSpring(0.5, 15))); },
+  energy(ctx, w, H, t) {
+    const px = w * 0.38, py = 24, len = H - 70, th0 = 0.6, th = th0 * Math.cos(2 * Math.PI * t / 2.2);
+    drawCeiling(ctx, px, py, 100); drawPendulum(ctx, px, py, len, th, 13);
+    const ep = (1 - Math.cos(th)) / (1 - Math.cos(th0)), ek = 1 - ep, bx = w * 0.72, bh = H - 70;
+    [[bx, ep, COL.lilac, 'Ep'], [bx + 44, ek, COL.accent, 'Ek']].forEach(([x, v, c, l]) => {
+      ctx.fillStyle = COL.surface; ctx.fillRect(x, 30, 26, bh); ctx.fillStyle = c; ctx.fillRect(x, 30 + bh * (1 - v), 26, bh * v);
+      ctx.strokeStyle = COL.line; ctx.strokeRect(x, 30, 26, bh); txt(ctx, l, x + 13, H - 22, {});
+    });
+  },
+  damped(ctx, w, H, t) {
+    const tt = t % 16, px = w / 2, py = 24, ww = Math.sqrt(G / 1), th = 0.5 * Math.exp(-0.22 * tt) * Math.cos(ww * tt);
+    drawCeiling(ctx, px, py, 100); drawPendulum(ctx, px, py, H - 62, th, 13);
+    txt(ctx, 'opór powietrza zabiera energię', px, H - 14, { size: 13, color: COL.muted, weight: 400 });
+  },
+  resonance(ctx, w, H, t) {
+    const tt = t % 18, T = 2.4, A = 0.06 + 0.42 * Math.min(1, tt / 13), ph = 2 * Math.PI * tt / T;
+    const seat = drawSwing(ctx, w / 2, 24, H - 84, A * Math.cos(ph + Math.PI), H - 22);
+    if (Math.cos(ph + Math.PI) < -0.95) arrow(ctx, seat.x - 52, seat.y, seat.x - 30, seat.y, COL.accent, false, 4);
+    txt(ctx, 'pchnięcia w rytmie huśtawki', w / 2, H - 8, { size: 12, color: COL.muted, weight: 400 });
+  },
+  graph(ctx, w, H, t) {
+    const x0 = 34, y0 = H / 2, A = H * 0.3, Tp = 110;
+    ctx.strokeStyle = COL.ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x0, 14); ctx.lineTo(x0, H - 14); ctx.moveTo(x0, y0); ctx.lineTo(w - 10, y0); ctx.stroke();
+    txt(ctx, 'x', x0 - 14, 20, {}); txt(ctx, 't', w - 14, y0 + 16, {});
+    const shown = Math.min(w - x0 - 14, (t * 60) % (w * 1.6));
+    ctx.strokeStyle = COL.primary; ctx.lineWidth = 3; ctx.beginPath();
+    for (let i = 0; i <= shown; i += 2) ctx.lineTo(x0 + i, y0 - A * Math.cos(2 * Math.PI * i / Tp));
+    ctx.stroke();
+    if (shown > Tp + 4) { arrow(ctx, x0, 22, x0 + Tp, 22, COL.accent, true, 2); txt(ctx, 'T', x0 + Tp / 2, 12, { color: COL.accent }); }
+    arrow(ctx, x0 + Tp, y0, x0 + Tp, y0 - A, COL.lilac, true, 2); txt(ctx, 'A', x0 + Tp + 12, y0 - A / 2, { color: COL.lilac });
+  }
+};
+const MINI_LABEL = { swing: 'Animacja: huśtawka', swinglabels: 'Animacja: huśtawka z położeniem równowagi i amplitudą', clock: 'Animacja: wahadło zegara i licznik drgań', lab: 'Animacja: krótkie i długie wahadło', spring: 'Animacja: ciężarek na sprężynie', energy: 'Animacja: energia potencjalna i kinetyczna wahadła', damped: 'Animacja: drgania tłumione', resonance: 'Animacja: rezonans huśtawki', graph: 'Animacja: wykres wychylenia od czasu' };
+function miniAnim(kind) {
+  const cv = h('canvas', { class: 'sim mini', role: 'img', 'aria-label': MINI_LABEL[kind] || 'Animacja' });
+  let t = 0;
+  Loop.add(dt => { if (animOn()) t += dt; const { ctx, w, h: H } = fit(cv); MINI[kind](ctx, w, H, t); }, cv);
+  return cv;
+}
+
+/* ----- Wspólne elementy eksperymentów ----- */
+function sliderRow(id, label, min, max, step, val, show, onChange) {
+  const out = h('output', { for: id }, show(val));
+  const inp = h('input', { type: 'range', id, min, max, step, value: val });
+  inp.addEventListener('input', () => { const v = +inp.value; out.textContent = show(v); onChange(v); });
+  return h('div', { class: 'sl' }, h('div', { class: 'row' }, h('label', { for: id, class: 'lbl' }, label), out), inp);
+}
+// Przycisk start/pauza dla symulacji (przy wyłączonych animacjach symulacja startuje zatrzymana)
+function playToggle(st) {
+  const b = h('button', { class: 'toggle', type: 'button' });
+  const paint = () => { b.innerHTML = ''; b.append(icon(st.paused ? 'play' : 'pause'), st.paused ? ' Uruchom' : ' Pauza'); b.setAttribute('aria-pressed', String(!st.paused)); };
+  b.addEventListener('click', () => { st.paused = !st.paused; paint(); });
+  paint(); return b;
+}
+// Mini-wyzwanie „zatrzymaj we właściwym momencie”
+function stopChallenge(o) {
+  let k = 0, frozen = false;
+  const p = h('p', {}, o.tasks[0].text), fb = h('p', { class: 'small', 'aria-live': 'polite' });
+  const btn = h('button', { class: 'btn primary big', type: 'button' }, 'Stop!');
+  btn.addEventListener('click', () => {
+    if (k >= o.tasks.length) return;
+    if (frozen) { frozen = false; o.freeze(false); btn.textContent = 'Stop!'; fb.textContent = ''; return; }
+    frozen = true; o.freeze(true);
+    const r = o.ratio(), task = o.tasks[k];
+    if (task.test(r)) {
+      fb.textContent = task.ok; Sound.play('good'); k++;
+      if (k >= o.tasks.length) { btn.textContent = 'Zaliczone'; btn.disabled = true; setTimeout(() => { o.freeze(false); }, 1400); o.onDone(); }
+      else { btn.textContent = 'Puść dalej'; setTimeout(() => { p.textContent = o.tasks[k].text; }, 900); }
+    } else { fb.textContent = task.miss(r); btn.textContent = 'Puść dalej'; }
+  });
+  return h('div', { class: 'chal' }, p, h('div', { class: 'row wrap' }, btn), fb);
+}
+
+/* ===== 7. EKRANY ===== */
+let streakMsg = null;
+const Screens = {};
+function go(name, ...args) {
+  cleanupScreen();
+  const app = $('#app'); app.innerHTML = ''; app.dataset.screen = name;
+  $('#btnHome').hidden = name === 'map';
+  window.scrollTo(0, 0);
+  Screens[name](...args);
+  try { app.focus({ preventScroll: true }); } catch (e) { }
+  updateHUD();
+}
+function setCrumb(t) { $('#crumb').textContent = t; }
+function updateHUD() {
+  const p = $('#hudPts'); p.innerHTML = ''; p.append(icon('star', true), `${S.points} pkt`);
+  if (S.streak.count > 1) p.append(' · ', icon('flame'), `${S.streak.count} dni`);
+  const b = $('#btnSound'); b.innerHTML = ''; b.append(icon(S.settings.sound ? 'sound' : 'mute'));
+  b.setAttribute('aria-pressed', String(S.settings.sound)); b.setAttribute('aria-label', S.settings.sound ? 'Dźwięk włączony – kliknij, aby wyłączyć' : 'Dźwięk wyłączony – kliknij, aby włączyć');
+}
+const hostTheme = document.documentElement.getAttribute('data-theme');
+function applySettings() {
+  const r = document.documentElement, st = S.settings;
+  r.style.setProperty('--scale', st.scale);
+  if (st.theme === 'auto') { if (hostTheme) r.setAttribute('data-theme', hostTheme); else r.removeAttribute('data-theme'); }
+  else r.setAttribute('data-theme', st.theme);
+  r.setAttribute('data-contrast', st.contrast ? 'high' : 'normal');
+  document.body.classList.toggle('focus', st.focus);
+  document.body.classList.toggle('noanim', !st.anim);
+  readColors(); updateHUD();
+}
+function stepBar(n, cur) { const b = h('div', { class: 'stepbar', role: 'progressbar', 'aria-valuemin': 1, 'aria-valuemax': n, 'aria-valuenow': cur + 1, 'aria-label': `Krok ${cur + 1} z ${n}` }); for (let i = 0; i < n; i++) b.append(h('span', { class: i < cur ? 'd' : i === cur ? 'c' : '' })); return b; }
+function progressBar(frac) { return h('div', { class: 'progress', 'aria-hidden': 'true' }, h('i', { style: `width:${Math.round(frac * 100)}%` })); }
+
+/* --- stan misji --- */
+function missionUnlocked(mod, m) { return S.settings.unlockAll || (m.requires || []).every(id => S.done[mod.id + ':' + id]); }
+function nextMission(mod) { return mod.missions.find(m => !S.done[mKey(mod, m)] && missionUnlocked(mod, m)); }
+
+/* --- MAPA --- */
+Screens.map = function () {
+  const mod = curMod(), app = $('#app'); setCrumb('Fizyka · klasa 8');
+  const nx = nextMission(mod), hr = new Date().getHours();
+  let hello = hr < 11 ? 'Dzień dobry!' : hr >= 19 ? 'Dobry wieczór!' : 'Cześć!';
+  if (streakMsg === 'first') hello = 'Cześć! Jestem Tika, mały metronom. Oprowadzę cię po Parku Drgań.';
+  else if (streakMsg === 'cont' || streakMsg === 'grace') hello += ` To już ${S.streak.count}. dzień nauki z rzędu.`;
+  else if (streakMsg === 'back') hello += ' Miło, że wracasz. Zaczynamy spokojnie.';
+  const tip = nx ? ` Proponuję: misja ${mod.missions.indexOf(nx) + 1} – „${nx.title}”. Zajmie ok. 4 minuty.` : ' Wszystkie misje za tobą! Spróbuj kartkówki próbnej albo popraw pomyłki.';
+  app.append(say(hello + tip));
+  if (!Store.ok) app.append(h('p', { class: 'helpbox small' }, 'Ta przeglądarka nie pozwala zapisać postępów. Możesz grać, ale po zamknięciu strony punkty się nie zachowają.'));
+
+  if (Modules.length > 1) {
+    const tabs = h('div', { class: 'tabs', role: 'tablist', 'aria-label': 'Moduły' });
+    Modules.forEach(m => tabs.append(h('button', { role: 'tab', type: 'button', 'aria-selected': String(m === mod), onclick: () => { S.modId = m.id; persist(); go('map'); } }, m.short + ': ' + m.title)));
+    app.append(tabs);
+  }
+  const doneN = mod.missions.filter(m => S.done[mKey(mod, m)]).length;
+  const st = mod.missions.reduce((a, m) => a + (S.stars[mKey(mod, m)] || 0), 0);
+  app.append(h('section', { class: 'stack' }, h('p', { class: 'eyebrow' }, mod.short), h('h1', {}, mod.title), progressBar(doneN / mod.missions.length),
+    h('p', { class: 'small muted' }, `${doneN} z ${mod.missions.length} misji · ${st} z ${mod.missions.length * 3} gwiazdek`)));
+
+  const path = h('ol', { class: 'path', 'aria-label': 'Ścieżka misji' });
+  mod.missions.forEach((m, i) => {
+    const key = mKey(mod, m), done = !!S.done[key], open = missionUnlocked(mod, m), isNext = m === nx;
+    const node = h('button', { class: 'node' + (done ? ' done' : '') + (isNext ? ' next' : '') + (open ? '' : ' locked'), type: 'button', 'aria-disabled': String(!open),
+      'aria-label': `Misja ${i + 1}: ${m.title}. ${m.place}. ${done ? 'Ukończona' : open ? 'Dostępna' : 'Zablokowana – najpierw ukończ wcześniejsze misje'}` },
+      h('span', { class: 'num' }, done ? icon('check') : open ? icon(m.icon) : icon('lock')),
+      h('span', { class: 'txt' }, isNext ? h('span', { class: 'tag-next' }, 'Następna') : null, h('b', {}, `${i + 1}. ${m.title}`), h('span', {}, `${m.place} · ok. 4 min`)),
+      done ? starsEl(S.stars[key] || 1) : null);
+    node.addEventListener('click', () => { if (open) go('mission', mod.missions.indexOf(m)); else toast('Ta misja otworzy się po ukończeniu: ' + m.requires.map(r => mod.missions.find(x => x.id === r).title).join(', '), 'lock'); });
+    path.append(h('li', {}, node));
+  });
+  app.append(path);
+  if (doneN >= 2 && doneN < mod.missions.length) app.append(h('p', { class: 'small muted' }, 'Misje 3–6 możesz robić w dowolnej kolejności.'));
+
+  const mist = Object.values(S.mistakes).filter(m => m.mod === mod.id).length;
+  const tile = (ic, title, desc, fn, extra) => h('button', { class: 'mode', type: 'button', onclick: fn }, icon(ic), h('b', {}, title, extra ? ' ' : '', extra || null), h('span', {}, desc));
+  app.append(h('h2', { class: 'sec' }, 'Przygotuj się do sprawdzianu'),
+    h('div', { class: 'modes' },
+      tile('timer', 'Szybka powtórka', '5 pytań, bez pośpiechu', () => go('testIntro', 'quick')),
+      tile('pencil', 'Kartkówka próbna', '10 pytań w stylu szkolnym', () => go('testIntro', 'kart')),
+      tile('clip', 'Sprawdzian próbny', '18 pytań, czas opcjonalnie', () => go('testIntro', 'spr')),
+      tile('redo', 'Moje pomyłki', 'Ćwicz to, co sprawiło kłopot', () => go('mistakes'), mist ? h('span', { class: 'count-badge' }, mist) : null),
+      tile('sheet', 'Ściągawka', 'Wzory, pojęcia, jednostki', () => go('cheat')),
+      tile('trophy', 'Kolekcja', 'Odznaki i skórki wahadła', () => go('collection'))));
+};
+
+/* --- MISJA: wstęp → eksperyment → zadania → podsumowanie --- */
+Screens.mission = function (mi) {
+  const mod = curMod(), m = mod.missions[mi], key = mKey(mod, m), diff = S.settings.difficulty;
+  S.sessions++; persist();
+  // zadania: obowiązkowe + losowane wg trudności + ewentualnie jedna pomyłka do powtórki
+  const pool = mod.questions.filter(q => q.mission === m.id);
+  const core = (m.core || []).map(id => mod.qIndex[id]);
+  const tasks = core.concat(weightedPick(pool, Math.max(0, 4 - core.length), diff, new Set(m.core || []))).map(q => mat(q, diff));
+  const due = dueMistakes(mod).find(x => x.mission === m.id && !tasks.some(t => t.id === x.id));
+  if (due) { const alt = altFor(mod, due, diff); if (alt && !tasks.some(t => t.id === alt.id)) tasks[tasks.length - 1] = alt; }
+  const steps = [...m.intro.map(x => ({ k: 'intro', x })), { k: 'exp' }, ...tasks.map((q, n) => ({ k: 'q', q, n })), { k: 'sum' }];
+  const results = []; let idx = 0, expGoal = false;
+  const app = $('#app');
+  setCrumb(`Misja ${mi + 1} · ${m.title}`);
+  function render() {
+    cleanupScreen(); app.innerHTML = ''; window.scrollTo(0, 0);
+    app.append(h('div', { class: 'stack' }, h('p', { class: 'eyebrow' }, `Misja ${mi + 1} · ${m.place}`), h('h1', {}, m.title), stepBar(steps.length, idx)));
+    const box = h('section', { class: 'stack' }); app.append(box);
+    const st = steps[idx];
+    if (st.k === 'intro') {
+      const first = idx === 0;
+      box.append(say(st.x.text));
+      if (st.x.anim) box.append(miniAnim(st.x.anim));
+      box.append(h('div', { class: 'actions' },
+        !first ? h('button', { class: 'btn ghost', type: 'button', onclick: () => { idx--; render(); } }, 'Wstecz') : null,
+        first && S.done[key] ? h('button', { class: 'btn ghost', type: 'button', onclick: () => { idx = m.intro.length; render(); } }, 'Pomiń wstęp') : null,
+        h('button', { class: 'btn primary', type: 'button', onclick: () => { idx++; render(); } }, 'Dalej')));
+    } else if (st.k === 'exp') {
+      const goalEl = h('p', { class: 'goal', hidden: true, role: 'status' });
+      box.append(h('p', { class: 'eyebrow' }, 'Eksperyment'), h('h2', {}, m.expTitle), goalEl);
+      const api = {
+        goal(msg) {
+          goalEl.hidden = false; goalEl.textContent = '✓ ' + msg;
+          if (!expGoal) { expGoal = true; S.points += 5; checkBadges(); toast('+5 pkt za eksperyment'); Sound.play('good'); }
+        }
+      };
+      mod.experiments[m.experiment](box, api);
+      box.append(h('div', { class: 'actions' }, h('button', { class: 'btn primary', type: 'button', onclick: () => { idx++; render(); } }, 'Przejdź do zadań')));
+    } else if (st.k === 'q') {
+      runQuestion(box, st.q, { label: `Zadanie ${st.n + 1} z ${tasks.length}`, onNext(r) { results.push(r); idx++; render(); } });
+    } else summary(box);
+  }
+  function summary(box) {
+    const pts = results.reduce((a, r) => a + r.points, 0) + (expGoal ? 5 : 0);
+    const ratio = results.reduce((a, r) => a + r.points, 0) / (tasks.length * 10);
+    const stars = ratio >= 0.85 ? 3 : ratio >= 0.5 ? 2 : 1;
+    const firstTime = !S.done[key];
+    S.done[key] = true; S.stars[key] = Math.max(S.stars[key] || 0, stars); persist(); checkBadges();
+    Sound.play('done');
+    const good = results.filter(r => r.ok).length;
+    const msg = good === results.length ? 'Misja ukończona – wszystko dobrze!' : good >= results.length / 2 ? 'Misja ukończona! Większość zadań poszła dobrze.' : 'Misja ukończona! Trudniejsze zadania wrócą w powtórce – tak się uczy mózg.';
+    const nxt = nextMission(mod);
+    box.append(h('div', { class: 'card' },
+      h('div', { class: 'bigstars', 'aria-label': `${stars} z 3 gwiazdek` }, [0, 1, 2].map(i => { const s = icon('star', true); if (i >= stars) s.classList.add('off'); return s; })),
+      h('h2', { style: 'text-align:center' }, msg),
+      h('p', { style: 'text-align:center' }, `Zdobyte punkty: +${pts}. Dobrze rozwiązane: ${good} z ${results.length}.`),
+      h('div', { class: 'stack' }, h('p', { class: 'lbl' }, 'Co już wiesz:'), h('ul', {}, m.learned.map(l => h('li', {}, l))))),
+      say(firstTime ? 'Dobra robota. Chcesz chwilę się przeciągnąć? 30 sekund przerwy pomaga w nauce.' : 'Każde powtórzenie utrwala wiedzę. Może krótka przerwa?'),
+      h('div', { class: 'actions' },
+        h('button', { class: 'btn ghost', type: 'button', onclick: () => go('brk', nxt ? mod.missions.indexOf(nxt) : null) }, icon('heart'), 'Przerwa 30 s'),
+        h('button', { class: 'btn ghost', type: 'button', onclick: () => go('map') }, icon('map'), 'Mapa'),
+        nxt ? h('button', { class: 'btn primary', type: 'button', onclick: () => go('mission', mod.missions.indexOf(nxt)) }, 'Następna misja') : null));
+  }
+  render();
+};
+
+/* --- PRZERWA --- */
+Screens.brk = function (nextIdx) {
+  const app = $('#app'); setCrumb('Przerwa');
+  const ideas = ['Wstań i sięgnij rękami do sufitu.', 'Pokręć powoli ramionami do tyłu.', 'Spójrz przez okno na coś daleko.', 'Zaciśnij i rozluźnij dłonie 5 razy.', 'Pokołysz się w lewo i w prawo – jak wahadło.', 'Napij się wody.'];
+  let left = 30;
+  const circle = h('div', { class: 'breath', role: 'timer', 'aria-label': 'Pozostały czas przerwy' }, String(left));
+  const breath = h('p', { style: 'text-align:center;font-weight:700' }, 'Wdech…');
+  S.flags.przerwa = true; persist(); checkBadges();
+  const after = () => nextIdx != null ? go('mission', nextIdx) : go('map');
+  const endBtns = h('div', { class: 'actions', style: 'justify-content:center' },
+    h('button', { class: 'btn ghost', type: 'button', onclick: () => go('map') }, 'Mapa'),
+    nextIdx != null ? h('button', { class: 'btn primary', type: 'button', onclick: after }, 'Następna misja') : null);
+  app.append(h('h1', {}, 'Chwila przerwy'), say(rnd(ideas)), circle, breath,
+    h('div', { class: 'actions', style: 'justify-content:center' }, h('button', { class: 'btn ghost', type: 'button', onclick: after }, 'Skończ przerwę')));
+  const iv = setInterval(() => {
+    left--; circle.textContent = String(Math.max(0, left));
+    breath.textContent = Math.floor((30 - left) / 4) % 2 ? 'Wydech…' : 'Wdech…';
+    if (left <= 0) { clearInterval(iv); breath.textContent = 'Gotowe! Wracamy, kiedy chcesz.'; app.append(endBtns); }
+  }, 1000);
+  onCleanup(() => clearInterval(iv));
+};
+
+/* --- TESTY: szybka powtórka, kartkówka, sprawdzian, pomyłki --- */
+const TESTS = {
+  quick: { title: 'Szybka powtórka', desc: '5 krótkich pytań z różnych misji. Pytania, które sprawiły kłopot, wracają tu w nowej formie.', n: 5, calc: 1, timer: 150 },
+  kart: { title: 'Kartkówka próbna', desc: '10 pytań jak w szkole: wybór odpowiedzi, prawda/fałsz, dopasowanie, luki i zadania rachunkowe (wzór, wynik, jednostka).', n: 10, calc: 3, types: ['mc', 'tf', 'match', 'slots', 'calc', 'click'] },
+  spr: { title: 'Sprawdzian próbny', desc: '18 pytań ze wszystkich misji. Możesz włączyć czas, ale nie musisz.', n: 18, calc: 4, timer: 25 * 60 },
+  mist: { title: 'Moje pomyłki', desc: 'Zadania, w których była pomyłka. Dwie dobre odpowiedzi w kolejnych sesjach i pomyłka znika z listy.' }
+};
+Screens.testIntro = function (kind) {
+  const t = TESTS[kind], app = $('#app'); setCrumb(t.title);
+  let timer = false;
+  const seg = h('div', { class: 'seg', role: 'group', 'aria-label': 'Poziom trudności' });
+  [[1, 'Łatwy'], [2, 'Średni'], [3, 'Wyzwanie']].forEach(([v, l]) => seg.append(h('button', { type: 'button', 'aria-pressed': String(S.settings.difficulty === v), onclick: e => { S.settings.difficulty = v; persist(); [...seg.children].forEach(b => b.setAttribute('aria-pressed', String(b === e.currentTarget))); } }, l)));
+  const tm = t.timer ? h('button', { class: 'switch', type: 'button', role: 'switch', 'aria-checked': 'false', 'aria-label': 'Wyzwanie na czas', onclick: e => { timer = !timer; e.currentTarget.setAttribute('aria-checked', String(timer)); } }) : null;
+  app.append(h('p', { class: 'eyebrow' }, 'Trening'), h('h1', {}, t.title), h('div', { class: 'card' }, h('p', {}, t.desc),
+    h('div', { class: 'stack' }, h('p', { class: 'lbl' }, 'Poziom trudności'), seg),
+    tm ? h('div', { class: 'setrow' }, h('div', {}, h('b', {}, 'Wyzwanie na czas'), h('small', {}, `Opcjonalne. ${Math.round(t.timer / 60)} min – po czasie możesz spokojnie dokończyć.`)), tm) : null,
+    h('p', { class: 'small muted' }, 'Wynik zobaczysz jako mocne strony i listę do powtórki – bez ocen.')),
+    h('div', { class: 'actions' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => go('map') }, 'Wróć'), h('button', { class: 'btn primary big', type: 'button', onclick: () => go('test', kind, timer) }, 'Zaczynamy')));
+};
+function buildTest(mod, kind, diff) {
+  const t = TESTS[kind];
+  if (kind === 'mist') return Object.values(S.mistakes).filter(m => m.mod === mod.id).slice(0, 10).map(m => mod.qIndex[m.id] && mat(mod.qIndex[m.id], diff)).filter(Boolean);
+  const out = [], used = new Set();
+  dueMistakes(mod).slice(0, kind === 'quick' ? 2 : 3).forEach(m => { const q = altFor(mod, m, diff); if (q && !used.has(q.id)) { used.add(q.id); out.push(q); } });
+  const gens = shuffle(mod.questions.filter(q => q.gen && !used.has(q.id)));
+  gens.slice(0, Math.max(0, t.calc - out.filter(q => q.type === 'calc').length)).forEach(q => { used.add(q.id); out.push(mat(q, diff)); });
+  const pool = mod.questions.filter(q => !q.gen && (!t.types || t.types.includes(q.type)));
+  weightedPick(pool, t.n - out.length, diff, used).forEach(q => out.push(mat(q, diff)));
+  return shuffle(out).slice(0, t.n);
+}
+Screens.test = function (kind, withTimer) {
+  const mod = curMod(), t = TESTS[kind], app = $('#app'), diff = S.settings.difficulty;
+  S.sessions++; persist();
+  const items = buildTest(mod, kind, diff);
+  if (!items.length) { go('mistakes'); return; }
+  const results = []; let i = 0, left = withTimer ? t.timer : 0;
+  const head = h('div', { class: 'stack' }), clock = h('span', { class: 'pill', role: 'timer' });
+  const host = h('section', { class: 'stack' });
+  app.append(head, host); setCrumb(t.title);
+  if (withTimer) {
+    const iv = setInterval(() => { left--; paintClock(); if (left <= 0) { clearInterval(iv); toast('Czas minął. Możesz spokojnie dokończyć – to tylko trening.', 'timer'); } }, 1000);
+    onCleanup(() => clearInterval(iv));
+  }
+  function paintClock() { clock.textContent = left > 0 ? `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}` : 'czas minął – spokojnie kończ'; }
+  function next() {
+    head.innerHTML = ''; host.innerHTML = ''; window.scrollTo(0, 0);
+    head.append(h('div', { class: 'row between wrap' }, h('h1', {}, t.title), withTimer ? clock : null), stepBar(items.length + 1, i));
+    if (withTimer) paintClock();
+    if (i >= items.length) return testSummary(host, kind, results);
+    runQuestion(host, items[i], { label: `Pytanie ${i + 1} z ${items.length}`, onNext(r) { results.push(r); i++; next(); } });
+  }
+  next();
+};
+function testSummary(host, kind, results) {
+  const mod = curMod();
+  if (kind === 'kart') S.flags.kartkowka = true;
+  if (kind === 'spr') S.flags.sprawdzian = true;
+  persist(); checkBadges(); Sound.play('done');
+  const by = {};
+  results.forEach(r => { const c = r.q.concept; by[c] = by[c] || { ok: 0, n: 0 }; by[c].n++; if (r.ok) by[c].ok++; });
+  const strong = Object.keys(by).filter(c => by[c].ok === by[c].n), review = Object.keys(by).filter(c => by[c].ok < by[c].n);
+  const good = results.filter(r => r.ok).length, first = results.filter(r => r.firstTry).length, helped = results.filter(r => r.usedHelp).length;
+  const pts = results.reduce((a, r) => a + r.points, 0);
+  host.append(h('div', { class: 'card' },
+    h('h2', {}, 'Gotowe! Oto twój postęp'),
+    h('div', { class: 'stats' },
+      h('div', { class: 'stat' }, h('b', {}, `${good}/${results.length}`), h('span', {}, 'zadań rozwiązanych dobrze')),
+      h('div', { class: 'stat' }, h('b', {}, first), h('span', {}, 'za pierwszym razem')),
+      h('div', { class: 'stat' }, h('b', {}, `+${pts}`), h('span', {}, 'punktów'))),
+    strong.length ? h('div', { class: 'stack' }, h('p', { class: 'lbl' }, 'Mocne strony'), h('div', { class: 'chips-list' }, strong.map(c => h('span', { class: 'cchip good' }, mod.concepts[c] || c)))) : null,
+    review.length ? h('div', { class: 'stack' }, h('p', { class: 'lbl' }, 'Do powtórki'), h('div', { class: 'chips-list' }, review.map(c => h('span', { class: 'cchip rev' }, mod.concepts[c] || c))),
+      h('p', { class: 'small muted' }, 'Te tematy trafiły do „Moich pomyłek” i wrócą w powtórkach w nowej formie.')) : h('p', {}, 'Nie ma nic do powtórki. Świetna robota!'),
+    helped ? h('p', { class: 'small' }, `Pomoc użyta ${helped} ${helped === 1 ? 'raz' : 'razy'}. Dobrze, że pytasz – tak się uczy.`) : null),
+    h('div', { class: 'actions' },
+      h('button', { class: 'btn ghost', type: 'button', onclick: () => go('cheat') }, icon('sheet'), 'Ściągawka'),
+      review.length ? h('button', { class: 'btn ghost', type: 'button', onclick: () => go('mistakes') }, icon('redo'), 'Moje pomyłki') : null,
+      h('button', { class: 'btn primary', type: 'button', onclick: () => go('map') }, 'Mapa')));
+}
+
+/* --- MOJE POMYŁKI --- */
+Screens.mistakes = function () {
+  const mod = curMod(), app = $('#app'); setCrumb('Moje pomyłki');
+  const list = Object.values(S.mistakes).filter(m => m.mod === mod.id);
+  app.append(h('p', { class: 'eyebrow' }, 'Trening'), h('h1', {}, 'Moje pomyłki'));
+  if (!list.length) {
+    app.append(say(S.fixed ? `Lista jest pusta, a ${S.fixed} dawnych pomyłek już opanowałaś. Brawo!` : 'Na razie nie ma tu nic. Pomyłki zapisują się same – to mapa tego, co warto poćwiczyć, a nie powód do wstydu.'),
+      h('div', { class: 'actions' }, h('button', { class: 'btn primary', type: 'button', onclick: () => go('map') }, 'Mapa')));
+    return;
+  }
+  app.append(say(`Masz ${list.length} ${list.length === 1 ? 'zadanie' : 'zadań'} do poprawy. Każde dobrze rozwiązane dwa razy znika z listy.`),
+    h('ul', { class: 'mlist' }, list.map(m => h('li', {}, h('b', {}, m.text), h('span', {}, `${mod.concepts[m.concept] || ''} · ${m.box ? 'jeszcze jedna dobra odpowiedź' : m.due <= S.sessions ? 'do powtórki teraz' : 'wróci w kolejnej sesji'}`)))),
+    h('div', { class: 'actions' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => go('map') }, 'Mapa'), h('button', { class: 'btn primary big', type: 'button', onclick: () => go('test', 'mist', false) }, 'Ćwicz pomyłki')));
+};
+
+/* --- ŚCIĄGAWKA --- */
+Screens.cheat = function () {
+  const mod = curMod(), app = $('#app'); setCrumb('Ściągawka');
+  const grid = h('div', { class: 'cheat' });
+  mod.cheatsheet.forEach(sec => {
+    const s = h('section', { class: sec.wide ? 'wide' : '' }, h('h3', {}, sec.title));
+    if (sec.items) s.append(h('dl', {}, sec.items.map(([a, b]) => [h('dt', {}, a), h('dd', {}, b)])));
+    if (sec.formulas) sec.formulas.forEach(([f, d]) => s.append(h('div', { class: 'fml' }, h('b', {}, f), h('span', {}, d))));
+    if (sec.list) s.append(h('ul', {}, sec.list.map(l => h('li', {}, l))));
+    if (sec.example) s.append(h('p', {}, h('b', {}, sec.example.task)), h('ol', {}, sec.example.lines.map(l => h('li', {}, l))));
+    grid.append(s);
+  });
+  app.append(h('div', { class: 'row between wrap' }, h('div', {}, h('p', { class: 'eyebrow' }, mod.short), h('h1', {}, 'Ściągawka: ' + mod.title)),
+    h('button', { class: 'btn ghost no-print', type: 'button', onclick: () => { try { window.print(); } catch (e) { } } }, icon('sheet'), 'Drukuj')),
+    h('p', { class: 'small muted no-print' }, 'Jedna strona do przejrzenia przed klasówką. Drukowanie: przycisk albo Ctrl+P / Cmd+P.'), grid);
+};
+
+/* --- KOLEKCJA --- */
+Screens.collection = function () {
+  const app = $('#app'); setCrumb('Kolekcja');
+  app.append(h('p', { class: 'eyebrow' }, 'Twoje nagrody'), h('h1', {}, 'Kolekcja'),
+    h('div', { class: 'stats' },
+      h('div', { class: 'stat' }, h('b', {}, S.points), h('span', {}, 'punktów')),
+      h('div', { class: 'stat' }, h('b', {}, totalStars()), h('span', {}, 'gwiazdek')),
+      h('div', { class: 'stat' }, h('b', {}, S.streak.count), h('span', {}, 'dni w serii (rekord: ' + S.streak.best + ')')),
+      h('div', { class: 'stat' }, h('b', {}, S.streak.days), h('span', {}, 'dni nauki razem')),
+      h('div', { class: 'stat' }, h('b', {}, S.fixed), h('span', {}, 'opanowanych pomyłek'))),
+    h('p', { class: 'small muted' }, 'Seria dni: jeden dzień przerwy jej nie przerywa. A gdy przerwa jest dłuższa, liczba dni nauki i rekord zostają.'));
+  app.append(h('h2', { class: 'sec' }, 'Odznaki'), h('div', { class: 'badges' }, BADGES.map(b => h('div', { class: 'badge' + (S.badges[b.id] ? '' : ' locked') },
+    h('span', { class: 'medal' }, icon(b.ic)), h('b', {}, b.name), h('span', {}, S.badges[b.id] ? b.desc : 'Jak zdobyć: ' + b.desc)))));
+  const grid = h('div', { class: 'skins' });
+  SKINS.forEach(s => {
+    const open = S.points >= s.cost, cv = h('canvas', { width: 128, height: 128, 'aria-hidden': 'true' });
+    const ctx = cv.getContext('2d'); ctx.scale(2, 2); drawBob(ctx, 32, 32, 18, s.id);
+    grid.append(h('button', { class: 'skin', type: 'button', disabled: !open, 'aria-pressed': String(S.skin === s.id), onclick: () => { S.skin = s.id; persist(); go('collection'); } },
+      cv, h('b', {}, s.name), h('span', { class: 'muted' }, open ? (S.skin === s.id ? 'wybrana' : 'wybierz') : `od ${s.cost} pkt`)));
+  });
+  app.append(h('h2', { class: 'sec' }, 'Skórki kulki wahadła'), h('p', { class: 'small muted' }, 'Wybrana skórka pojawia się we wszystkich wahadłach w grze.'), grid);
+};
+
+/* --- USTAWIENIA (panel) --- */
+function closeOverlay() { const ov = $('#overlay'); ov.hidden = true; ov.innerHTML = ''; $('#btnSettings').focus(); }
+function openSettings() {
+  const ov = $('#overlay'), st = S.settings; ov.innerHTML = ''; ov.hidden = false;
+  const sw = (key, label, desc) => {
+    const b = h('button', { class: 'switch', type: 'button', role: 'switch', 'aria-checked': String(!!st[key]), 'aria-label': label });
+    b.addEventListener('click', () => { st[key] = !st[key]; b.setAttribute('aria-checked', String(st[key])); persist(); applySettings(); if (key === 'sound' && st.sound) Sound.play('ok'); if (key === 'unlockAll' && $('#app').dataset.screen === 'map') go('map'); });
+    return h('div', { class: 'setrow' }, h('div', {}, h('b', {}, label), desc ? h('small', {}, desc) : null), b);
+  };
+  const seg = (key, label, opts) => {
+    const g = h('div', { class: 'seg', role: 'group', 'aria-label': label });
+    opts.forEach(([v, l]) => g.append(h('button', { type: 'button', 'aria-pressed': String(st[key] === v), onclick: e => { st[key] = v; persist(); applySettings(); [...g.children].forEach(x => x.setAttribute('aria-pressed', String(x === e.currentTarget))); } }, l)));
+    return h('div', { class: 'stack', style: 'gap:.4rem;padding-block:.35rem' }, h('b', {}, label), g);
+  };
+  const vol = h('input', { type: 'range', id: 'setVol', min: 0.1, max: 1, step: 0.1, value: st.volume });
+  vol.addEventListener('change', () => { st.volume = +vol.value; persist(); Sound.play('ok'); });
+  let armed = false;
+  const reset = h('button', { class: 'btn ghost', type: 'button' }, 'Wyczyść postęp');
+  reset.addEventListener('click', () => {
+    if (!armed) { armed = true; reset.textContent = 'Na pewno? Kliknij jeszcze raz'; setTimeout(() => { armed = false; reset.textContent = 'Wyczyść postęp'; }, 4000); return; }
+    const keep = S.settings; S = defaults(); S.settings = keep; updateStreak(); persist(); closeOverlay(); go('map');
+  });
+  const panel = h('div', { class: 'sheet', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'setTitle' },
+    h('div', { class: 'row between' }, h('h2', { id: 'setTitle' }, 'Ustawienia'), h('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Zamknij ustawienia', onclick: closeOverlay }, '×')),
+    sw('sound', 'Dźwięk', 'Ciche, łagodne tony. Nigdy dźwięk „porażki”.'),
+    h('div', { class: 'sl' }, h('label', { for: 'setVol', class: 'lbl' }, 'Głośność'), vol),
+    sw('anim', 'Animacje', 'Wyłączone: symulacje startują zatrzymane, bez efektów ruchu.'),
+    sw('focus', 'Tryb skupienia', 'Mniej ozdobników, bez postaci przewodniczki.'),
+    sw('contrast', 'Wysoki kontrast'),
+    seg('theme', 'Motyw', [['auto', 'Automatyczny'], ['light', 'Jasny'], ['dark', 'Ciemny']]),
+    seg('scale', 'Wielkość tekstu', [[0.9, 'A−'], [1, 'A'], [1.15, 'A+'], [1.3, 'A++']]),
+    seg('difficulty', 'Poziom trudności', [[1, 'Łatwy'], [2, 'Średni'], [3, 'Wyzwanie']]),
+    sw('unlockAll', 'Otwórz wszystkie misje', 'Dla nauczyciela lub rodzica albo gdy chcesz wybrać dowolną misję.'),
+    h('div', { class: 'setrow' }, h('div', {}, h('b', {}, 'Postęp'), h('small', {}, 'Usuwa punkty, odznaki i pomyłki. Ustawienia zostają.')), reset),
+    h('p', { class: 'small muted' }, 'Klawiatura: Tab – przejście dalej, Enter – wybór, cyfry 1–4 – odpowiedzi, Esc – zamknij panel.'));
+  ov.append(panel);
+  ov.onclick = e => { if (e.target === ov) closeOverlay(); };
+  panel.querySelector('button').focus();
+}
+
+/* =====================================================================
+   8. MODUŁ 1: RUCH DRGAJĄCY – BANK ZADAŃ
+   Format zadania (wspólne pola): id, mission, concept, level (1–3), type, q (treść),
+   hint (delikatna wskazówka), expl (wyjaśnienie „dlaczego tak?”), ok (opcjonalna pochwała),
+   anim (opcjonalna mini-animacja do wyjaśnienia), steps (opcjonalnie: pomoc krok po kroku).
+   Typy: mc (poprawna odpowiedź ZAWSZE pierwsza w opts – kolejność jest losowana),
+   tf (answer: true/false), match (pairs), slots (template z [[0]], answers, extra),
+   click (svg z elementami data-hot, correct), slider (sim, min, max, step, init, check, target),
+   calc (generator gen(poziom) zwraca dane z losowymi liczbami).
+   ===================================================================== */
+const Q_DRGANIA = [
+  /* ---------- Misja 1: Co to jest drganie? ---------- */
+  { id: 'd01', mission: 'm1', concept: 'rownowaga', level: 1, type: 'click', svg: SV.positions(), correct: ['O'],
+    q: 'Kliknij położenie równowagi wahadła.',
+    hint: 'To miejsce, w którym kulka wisiałaby spokojnie, gdyby nikt jej nie ruszał.',
+    expl: 'Położenie równowagi to punkt O – kulka wisi tam pionowo w dół. Wokół niego odbywa się cały ruch.',
+    ok: 'Tak! W punkcie O kulka spoczywałaby, gdyby nie drgała.', anim: 'swinglabels' },
+  { id: 'd02', mission: 'm1', concept: 'amplituda', level: 2, type: 'click', svg: SV.swingArrows(), correct: ['a1'],
+    q: 'Która strzałka pokazuje amplitudę? Kliknij ją.',
+    hint: 'Amplituda zaczyna się w położeniu równowagi.',
+    expl: 'Amplituda to największe wychylenie: od położenia równowagi do skrajnego położenia (strzałka 1). Strzałka 2 to odległość między skrajnymi położeniami, czyli dwie amplitudy. Strzałka 3 to długość nici.',
+    anim: 'swinglabels' },
+  { id: 'd03', mission: 'm1', concept: 'drganie', level: 1, type: 'mc', q: 'Ruch drgający to ruch…',
+    opts: ['tam i z powrotem wokół położenia równowagi', 'po okręgu ze stałą prędkością', 'w jedną stronę po linii prostej', 'który zawsze trwa dokładnie 1 sekundę'],
+    hint: 'Pomyśl o huśtawce albo o strunie gitary.', expl: 'Ciało drgające porusza się tam i z powrotem i wciąż przechodzi przez położenie równowagi.', anim: 'swing' },
+  { id: 'd04', mission: 'm1', concept: 'amplituda', level: 1, type: 'tf', answer: true, q: 'Amplituda to największe wychylenie z położenia równowagi.',
+    hint: 'Przypomnij sobie strzałkę od środka do skrajnego położenia.', expl: 'Tak – amplituda (A) to największe wychylenie. Mierzymy ją w metrach lub centymetrach.' },
+  { id: 'd05', mission: 'm1', concept: 'amplituda', level: 1, type: 'tf', answer: false, q: 'Podczas drgań wychylenie ciała jest cały czas takie samo.',
+    hint: 'Gdzie wychylenie jest zerowe, a gdzie największe?', expl: 'Wychylenie ciągle się zmienia: jest równe zero w położeniu równowagi i równe amplitudzie w skrajnym położeniu.', anim: 'swinglabels' },
+  { id: 'd06', mission: 'm1', concept: 'amplituda', level: 2, type: 'mc', q: 'Odległość między skrajnymi położeniami huśtawki wynosi 1,2 m. Ile wynosi amplituda?',
+    opts: ['0,6 m', '1,2 m', '2,4 m', '0,3 m'], hint: 'Między skrajnymi położeniami mieszczą się dwie amplitudy.',
+    expl: 'Od jednego skrajnego położenia do drugiego są dwie amplitudy: 1,2 m : 2 = 0,6 m.', anim: 'swinglabels' },
+  { id: 'd07', mission: 'm1', concept: 'amplituda', level: 2, type: 'match', q: 'Dopasuj pojęcia do opisów.',
+    pairs: [['Położenie równowagi', 'miejsce, w którym ciało spoczywa, gdy nie drga'], ['Wychylenie', 'odległość od położenia równowagi w danej chwili'], ['Amplituda', 'największe wychylenie'], ['Pełne drganie', 'ruch tam i z powrotem do punktu startu']],
+    hint: 'Zacznij od pary, której jesteś najbardziej pewna.', expl: 'Wychylenie zmienia się w każdej chwili, a amplituda to jego największa wartość. Pełne drganie kończy się w punkcie startu.' },
+  { id: 'd08', mission: 'm1', concept: 'drganie', level: 1, type: 'mc', q: 'Który ruch jest drgający?',
+    opts: ['struna gitary po szarpnięciu', 'samochód jadący prosto', 'spadające jabłko', 'piłka tocząca się po boisku'],
+    hint: 'Szukaj ruchu „tam i z powrotem”.', expl: 'Struna po szarpnięciu wychyla się w obie strony wokół położenia równowagi. Pozostałe ciała poruszają się w jedną stronę.' },
+  { id: 'd09', mission: 'm1', concept: 'rownowaga', level: 1, type: 'slots', q: 'Uzupełnij zdania.',
+    template: 'Ciało drgające porusza się wokół położenia [[0]]. Największe wychylenie to [[1]].', answers: ['równowagi', 'amplituda'], extra: ['okres', 'częstotliwość'],
+    hint: 'Pierwsza luka: gdzie ciało spoczywa? Druga: jak nazywamy największe wychylenie?', expl: 'Ruch odbywa się wokół położenia równowagi, a największe wychylenie to amplituda.' },
+  { id: 'd10', mission: 'm1', concept: 'amplituda', level: 2, type: 'click', svg: SV.graphAmp(), correct: ['a1'],
+    q: 'To wykres wychylenia od czasu. Kliknij strzałkę, która pokazuje amplitudę.',
+    hint: 'Amplitudę mierzymy od osi czasu (położenia równowagi) do szczytu.',
+    expl: 'Strzałka 1 biegnie od osi (wychylenie zero) do szczytu – to amplituda. Strzałka 2 to dwie amplitudy, a strzałka 3 pokazuje czas jednego drgania, czyli okres.', anim: 'graph' },
+  { id: 'd11', mission: 'm1', concept: 'drganie', level: 3, type: 'mc', q: 'Kulka startuje w skrajnym punkcie A, przechodzi przez O do B i wraca do A. Ile pełnych drgań wykonała?',
+    opts: ['1', '2', '0,5', '4'], hint: 'Pełne drganie kończy się, gdy ciało wraca do punktu startu.',
+    expl: 'A → O → B → O → A to jedno pełne drganie. Samo przejście z A do B to połowa drgania.', anim: 'swinglabels' },
+  { id: 'd12', mission: 'm1', concept: 'drganie', level: 3, type: 'tf', answer: false, q: 'Ruch Ziemi wokół Słońca to ruch drgający.',
+    hint: 'Czy Ziemia porusza się tam i z powrotem wokół położenia równowagi?', expl: 'Ten ruch powtarza się (jest okresowy), ale to ruch po orbicie, a nie tam i z powrotem wokół położenia równowagi.' },
+
+  /* ---------- Misja 2: Okres i częstotliwość ---------- */
+  { id: 'd20', mission: 'm2', concept: 'wzory', level: 1, type: 'slots', formula: true, q: 'Zbuduj wzór na częstotliwość, gdy znasz okres.',
+    template: '[[0]] = [[1]] / [[2]]', answers: ['f', '1', 'T'], extra: ['n', 't'],
+    hint: 'Częstotliwość to odwrotność okresu.', expl: 'f = 1 / T. Im krótszy okres, tym więcej drgań w każdej sekundzie.', ok: 'Tak! f = 1 / T – ten wzór przyda się na każdej kartkówce.' },
+  { id: 'd21', mission: 'm2', concept: 'wzory', level: 2, type: 'slots', formula: true, q: 'Zbuduj wzór na okres, gdy znasz czas t i liczbę drgań n.',
+    template: '[[0]] = [[1]] / [[2]]', answers: ['T', 't', 'n'], extra: ['f', '1'],
+    hint: 'Okres to czas JEDNEGO drgania. Cały czas dzielisz na…', expl: 'T = t / n: cały czas dzielimy przez liczbę drgań i dostajemy czas jednego drgania.' },
+  { id: 'd22', mission: 'm2', concept: 'wzory', level: 2, type: 'slots', formula: true, q: 'Zbuduj wzór na częstotliwość z liczby drgań n i czasu t.',
+    template: '[[0]] = [[1]] / [[2]]', answers: ['f', 'n', 't'], extra: ['T', '1'],
+    hint: 'Częstotliwość to liczba drgań w jednej sekundzie.', expl: 'f = n / t: liczbę drgań dzielimy przez czas i wiemy, ile drgań przypada na 1 s.' },
+  { id: 'd23', mission: 'm2', concept: 'jednostki', level: 1, type: 'mc', q: 'Jednostką częstotliwości jest…',
+    opts: ['herc (Hz)', 'sekunda (s)', 'metr (m)', 'niuton (N)'], hint: 'Nazwa pochodzi od nazwiska fizyka Heinricha Hertza.', expl: 'Częstotliwość mierzymy w hercach: 1 Hz = 1 drganie na sekundę.' },
+  { id: 'd24', mission: 'm2', concept: 'czestotliwosc', level: 1, type: 'tf', answer: true, q: 'Częstotliwość 1 Hz oznacza jedno pełne drganie w ciągu 1 sekundy.',
+    hint: 'Herc to „na sekundę”.', expl: 'Tak: 1 Hz = 1/s, czyli jedno drganie w każdej sekundzie.' },
+  { id: 'd25', mission: 'm2', concept: 'okres', level: 1, type: 'mc', q: 'Okres drgań to…',
+    opts: ['czas trwania jednego pełnego drgania', 'liczba drgań w ciągu 1 s', 'największe wychylenie', 'droga przebyta w jednym drganiu'],
+    hint: 'Okres mierzymy w sekundach.', expl: 'Okres T to czas jednego pełnego drgania. Liczba drgań w 1 s to częstotliwość.', anim: 'clock' },
+  { id: 'd26', mission: 'm2', concept: 'okres', level: 3, type: 'mc', q: 'Ciało przechodzi z jednego skrajnego położenia do drugiego w 0,5 s. Ile wynosi okres?',
+    opts: ['1 s', '0,5 s', '0,25 s', '2 s'], hint: 'Przejście z jednej strony na drugą to dopiero połowa drgania.',
+    expl: 'Pełne drganie to tam i z powrotem: 0,5 s + 0,5 s = 1 s.', anim: 'swinglabels' },
+  { id: 'd27', mission: 'm2', concept: 'czestotliwosc', level: 2, type: 'tf', answer: false, q: 'Im dłuższy okres, tym większa częstotliwość.',
+    hint: 'Pomyśl o wzorze f = 1 / T.', expl: 'Dłuższy okres oznacza mniej drgań w każdej sekundzie, czyli MNIEJSZĄ częstotliwość.' },
+  { id: 'd28', mission: 'm2', concept: 'jednostki', level: 1, type: 'slots', q: 'Uzupełnij zdania.',
+    template: 'Okres oznaczamy literą [[0]] i mierzymy w [[1]]. Częstotliwość oznaczamy literą [[2]] i mierzymy w [[3]].',
+    answers: ['T', 'sekundach', 'f', 'hercach'], extra: ['metrach', 'n'],
+    hint: 'Okres to czas, a częstotliwość to „ile razy na sekundę”.', expl: 'Okres T – w sekundach (s). Częstotliwość f – w hercach (Hz).' },
+  { id: 'd29', mission: 'm2', concept: 'jednostki', level: 2, type: 'match', q: 'Dopasuj wielkość do jednostki.',
+    pairs: [['Okres', 's'], ['Częstotliwość', 'Hz'], ['Amplituda', 'm'], ['Liczba drgań', 'bez jednostki']],
+    hint: 'Amplituda to odległość, a liczba drgań to po prostu liczba.', expl: 'Okres – sekundy, częstotliwość – herce, amplituda – metry (lub cm), liczba drgań nie ma jednostki.' },
+  { id: 'd30', mission: 'm2', concept: 'okres', level: 2, type: 'click', svg: SV.graphPeriod(), correct: ['s2'],
+    q: 'Na wykresie zaznaczono trzy przedziały czasu. Kliknij ten, który trwa dokładnie jeden okres.',
+    hint: 'Jeden okres to odstęp między dwoma kolejnymi szczytami.',
+    expl: 'Przedział 2 biegnie od szczytu do następnego szczytu – to jeden okres. Przedział 1 to połowa okresu, przedział 3 – dwa okresy.', anim: 'graph' },
+  { id: 'd31', mission: 'm2', concept: 'czestotliwosc', level: 2, type: 'mc', q: 'Wahadło A ma częstotliwość 2 Hz, a wahadło B – 0,5 Hz. Które drga szybciej?',
+    opts: ['wahadło A', 'wahadło B', 'oba tak samo'], hint: 'Większa częstotliwość = więcej drgań w sekundzie.',
+    expl: 'A wykonuje 2 drgania na sekundę, a B tylko pół drgania. A drga szybciej (ma krótszy okres: 0,5 s, a B: 2 s).' },
+  { id: 'd32', mission: 'm2', concept: 'okres', level: 3, type: 'mc', q: 'Okres drgań wynosi 0,2 s. Co to znaczy?',
+    opts: ['W ciągu 1 s ciało wykona 5 pełnych drgań', 'W ciągu 1 s ciało wykona 0,2 drgania', 'Ciało wychyla się o 0,2 m', 'Jedno drganie trwa 2 s'],
+    hint: 'Ile razy 0,2 s mieści się w 1 sekundzie?', expl: 'Jedno drganie trwa 0,2 s, więc w 1 s mieści się 1 : 0,2 = 5 drgań. To częstotliwość 5 Hz.' },
+
+  /* ---------- Misja 3: Wahadło – laboratorium ---------- */
+  { id: 'd40', mission: 'm3', concept: 'wahadlo', level: 2, type: 'slider', sim: 'pendulumL', min: 0.1, max: 2.5, step: 0.01, init: 0.4, target: 0.99,
+    label: 'Długość nici', q: 'Ustaw długość wahadła tak, aby okres wynosił około 2 s.',
+    check: v => Math.abs(periodPendulum(v) - 2) <= 0.08,
+    hintFn: v => periodPendulum(v) < 2 ? 'Okres jest jeszcze za krótki – wydłuż nić.' : 'Okres jest za długi – skróć nić.',
+    hint: 'Dłuższa nić = dłuższy okres. Obserwuj odczyt pod suwakiem.', expl: 'Wahadło o długości ok. 1 m ma okres ok. 2 s – w każdą stronę waha się po 1 s. Takie wahadła są w starych zegarach.', anim: 'lab' },
+  { id: 'd41', mission: 'm3', concept: 'wahadlo', level: 3, type: 'slider', sim: 'pendulumL', min: 0.1, max: 2.5, step: 0.01, init: 1.5, target: 0.25,
+    label: 'Długość nici', q: 'Ustaw długość tak, aby wahadło miało częstotliwość 1 Hz.',
+    check: v => Math.abs(periodPendulum(v) - 1) <= 0.05,
+    hintFn: v => periodPendulum(v) > 1 ? 'Drga za wolno. Skróć nić.' : 'Drga za szybko. Wydłuż nić.',
+    hint: 'f = 1 Hz oznacza okres T = 1 / f = 1 s.', expl: 'Przy f = 1 Hz okres T = 1 s. Daje go nić długości ok. 25 cm.', anim: 'lab' },
+  { id: 'd42', mission: 'm3', concept: 'wahadlo', level: 1, type: 'mc', q: 'Co zauważyłaś? Gdy zwiększamy masę kulki (długość bez zmian), okres wahadła…',
+    opts: ['nie zmienia się', 'rośnie', 'maleje'], hint: 'Przypomnij sobie pomiary z laboratorium: zmieniała się tylko masa.',
+    expl: 'Okres wahadła zależy od długości nici, a nie od masy kulki.', ok: 'Świetnie, zauważyłaś, że masa nie zmienia okresu!', anim: 'lab' },
+  { id: 'd43', mission: 'm3', concept: 'wahadlo', level: 1, type: 'mc', q: 'Gdy wydłużamy nić wahadła, jego okres…',
+    opts: ['rośnie', 'maleje', 'nie zmienia się'], hint: 'Dłuższe wahadło waha się wolniej czy szybciej?',
+    expl: 'Dłuższe wahadło waha się wolniej, więc jedno drganie trwa dłużej.', ok: 'Tak – dłuższe wahadło waha się wolniej.', anim: 'lab' },
+  { id: 'd44', mission: 'm3', concept: 'wahadlo', level: 2, type: 'tf', answer: true, q: 'Przy małych wychyleniach okres wahadła praktycznie nie zależy od amplitudy.',
+    hint: 'Co wyszło w laboratorium, gdy zmieniałaś wychylenie początkowe?', expl: 'Przy małych wychyleniach (kilkanaście stopni) okres jest praktycznie taki sam, bez względu na amplitudę.' },
+  { id: 'd45', mission: 'm3', concept: 'wahadlo', level: 3, type: 'mc', q: 'Zegar z wahadłem się spieszy, bo wahadło waha się za szybko. Co trzeba zrobić?',
+    opts: ['wydłużyć wahadło', 'skrócić wahadło', 'dać cięższy ciężarek', 'mocniej rozhuśtać wahadło'],
+    hint: 'Co zwiększa okres wahadła?', expl: 'Dłuższe wahadło ma dłuższy okres, więc zegar zwolni. Masa i (przy małych wychyleniach) amplituda okresu nie zmieniają.' },
+  { id: 'd46', mission: 'm3', concept: 'wahadlo', level: 2, type: 'mc', q: 'Dwa wahadła mają tę samą długość. Jedno ma kulkę drewnianą, drugie – stalową, cięższą. Które ma dłuższy okres?',
+    opts: ['oba mają taki sam okres', 'wahadło ze stalową kulką', 'wahadło z drewnianą kulką'], hint: 'Czy masa wpływa na okres wahadła?',
+    expl: 'Okres wahadła nie zależy od masy kulki. Przy tej samej długości okresy są takie same.' },
+  { id: 'd47', mission: 'm3', concept: 'wahadlo', level: 2, type: 'slots', q: 'Uzupełnij zdania.',
+    template: 'Okres wahadła zależy od jego [[0]]. Nie zależy od [[1]] kulki.', answers: ['długości', 'masy'], extra: ['okresu', 'częstotliwości'],
+    hint: 'Co zmieniało okres w laboratorium, a co nie?', expl: 'Okres zmienia długość nici. Masa kulki nie ma wpływu.' },
+  { id: 'd48', mission: 'm3', concept: 'wahadlo', level: 1, type: 'tf', answer: true, q: 'Krótsze wahadło waha się szybciej niż dłuższe.',
+    hint: 'Porównaj krótkie i długie wahadło z animacji.', expl: 'Krótsze wahadło ma krótszy okres, czyli wykonuje więcej drgań w tym samym czasie.', anim: 'lab' },
+  { id: 'd49', mission: 'm3', concept: 'wahadlo', level: 3, type: 'mc', q: 'Ola zmieniła naraz długość i masę wahadła. Okres się zmienił. Co może powiedzieć?',
+    opts: ['Nie wie, która zmiana to spowodowała – trzeba zmieniać jedną rzecz naraz', 'Na pewno okres zmieniła masa', 'Na pewno okres zmieniła długość i masa'],
+    hint: 'Jak pracuje badaczka w laboratorium?', expl: 'Gdy zmieniamy dwie rzeczy naraz, nie wiadomo, która wpłynęła na wynik. Dlatego w doświadczeniu zmieniamy tylko jedną wielkość.' },
+
+  /* ---------- Misja 4: Sprężyna ---------- */
+  { id: 'd50', mission: 'm4', concept: 'sprezyna', level: 1, type: 'mc', q: 'Na tej samej sprężynie zawieszamy cięższy ciężarek. Okres drgań…',
+    opts: ['wzrośnie', 'zmaleje', 'nie zmieni się'], hint: 'Cięższy ciężarek drga wolniej czy szybciej?',
+    expl: 'Większa masa ciężarka = wolniejsze drgania = dłuższy okres. Tu masa ma znaczenie, inaczej niż w wahadle!', ok: 'Tak – cięższy ciężarek drga wolniej.', anim: 'spring' },
+  { id: 'd51', mission: 'm4', concept: 'sprezyna', level: 2, type: 'mc', q: 'Wymieniamy sprężynę na sztywniejszą (twardszą), a ciężarek zostaje ten sam. Okres drgań…',
+    opts: ['zmaleje', 'wzrośnie', 'nie zmieni się'], hint: 'Sztywna sprężyna mocniej „ciągnie” ciężarek z powrotem.',
+    expl: 'Sztywniejsza sprężyna szybciej zawraca ciężarek, więc drgania są szybsze, a okres krótszy.' },
+  { id: 'd52', mission: 'm4', concept: 'sprezyna', level: 2, type: 'slider', sim: 'springM', k: 20, min: 0.05, max: 1.5, step: 0.01, init: 0.15, target: 0.51,
+    label: 'Masa ciężarka', q: 'Ustaw masę ciężarka tak, aby okres drgań wynosił około 1 s.',
+    check: v => Math.abs(periodSpring(v, 20) - 1) <= 0.05,
+    hintFn: v => periodSpring(v, 20) < 1 ? 'Drga za szybko – zwiększ masę.' : 'Drga za wolno – zmniejsz masę.',
+    hint: 'Większa masa = dłuższy okres.', expl: 'Na tej sprężynie okres 1 s daje ciężarek o masie ok. 0,5 kg.', anim: 'spring' },
+  { id: 'd53', mission: 'm4', concept: 'sprezyna', level: 1, type: 'tf', answer: true, q: 'Ciężarek zawieszony na sprężynie wykonuje ruch drgający wokół położenia równowagi.',
+    hint: 'Czy ciężarek porusza się tam i z powrotem?', expl: 'Tak: ciężarek porusza się w górę i w dół wokół położenia, w którym wisiałby spokojnie.', anim: 'spring' },
+  { id: 'd54', mission: 'm4', concept: 'sprezyna', level: 2, type: 'match', q: 'Dopasuj zmianę do skutku.',
+    pairs: [['Większa masa ciężarka', 'drgania wolniejsze (dłuższy okres)'], ['Sztywniejsza sprężyna', 'drgania szybsze (krótszy okres)'], ['Ciężarek wisi nieruchomo', 'położenie równowagi']],
+    hint: 'Masa „spowalnia”, sztywność „przyspiesza”.', expl: 'Większa masa wydłuża okres, sztywniejsza sprężyna go skraca. Ciężarek wiszący w spoczynku jest w położeniu równowagi.' },
+  { id: 'd55', mission: 'm4', concept: 'sprezyna', level: 3, type: 'mc', q: 'Który zestaw będzie drgał najszybciej?',
+    opts: ['lekki ciężarek i sztywna sprężyna', 'ciężki ciężarek i miękka sprężyna', 'ciężki ciężarek i sztywna sprężyna', 'lekki ciężarek i miękka sprężyna'],
+    hint: 'Połącz oba efekty: co skraca okres?', expl: 'Mała masa skraca okres i sztywna sprężyna też go skraca. Razem dają najszybsze drgania.' },
+  { id: 'd56', mission: 'm4', concept: 'sprezyna', level: 2, type: 'tf', answer: true, q: 'Okres drgań ciężarka na sprężynie zależy od masy ciężarka.',
+    hint: 'Uwaga: tu jest inaczej niż w wahadle.', expl: 'Tak! W wahadle masa nie ma znaczenia, ale dla ciężarka na sprężynie większa masa oznacza dłuższy okres.' },
+
+  /* ---------- Misja 5: Energia w ruchu ---------- */
+  { id: 'd60', mission: 'm5', concept: 'energia', level: 1, type: 'click', svg: SV.positions(), correct: ['O'],
+    q: 'Kliknij punkt, w którym kulka ma największą energię kinetyczną.',
+    hint: 'Energia kinetyczna jest największa tam, gdzie kulka jest najszybsza.',
+    expl: 'W położeniu równowagi (O) kulka porusza się najszybciej, więc ma największą energię kinetyczną.', anim: 'energy' },
+  { id: 'd61', mission: 'm5', concept: 'energia', level: 1, type: 'click', svg: SV.positions(), correct: ['A', 'B'],
+    q: 'Kliknij punkt, w którym kulka ma największą energię potencjalną.',
+    hint: 'Energia potencjalna zależy od wysokości.',
+    expl: 'W skrajnych położeniach (A i B) kulka jest najwyżej, więc ma największą energię potencjalną. Oba punkty są dobrą odpowiedzią.', anim: 'energy' },
+  { id: 'd62', mission: 'm5', concept: 'energia', level: 2, type: 'mc', q: 'W położeniu równowagi kulka wahadła ma…',
+    opts: ['największą prędkość', 'prędkość równą zero', 'największą energię potencjalną', 'najmniejszą energię kinetyczną'],
+    hint: 'Gdzie kulka „przelatuje” najszybciej?', expl: 'W położeniu równowagi kulka jest najniżej i najszybsza: energia kinetyczna jest największa.', anim: 'energy' },
+  { id: 'd63', mission: 'm5', concept: 'energia', level: 2, type: 'tf', answer: true, q: 'W skrajnym położeniu prędkość kulki wahadła jest równa zero.',
+    hint: 'Co dzieje się z kulką w momencie zawracania?', expl: 'Kulka na chwilę się zatrzymuje, żeby zawrócić. Wtedy cała energia jest potencjalna.', anim: 'energy' },
+  { id: 'd64', mission: 'm5', concept: 'energia', level: 1, type: 'slots', q: 'Uzupełnij zdanie.',
+    template: 'Gdy kulka opada ze skrajnego położenia, energia [[0]] zamienia się w energię [[1]].', answers: ['potencjalna', 'kinetyczną'], extra: ['kinetyczna', 'potencjalną'],
+    hint: 'Kulka traci wysokość i nabiera prędkości.', expl: 'Spadając, kulka traci wysokość (energię potencjalną) i zyskuje prędkość (energię kinetyczną).', anim: 'energy' },
+  { id: 'd65', mission: 'm5', concept: 'energia', level: 2, type: 'slots', q: 'Gdzie której energii jest najwięcej? Ułóż klocki.',
+    template: 'Skrajne lewe: [[0]] · Środek: [[1]] · Skrajne prawe: [[2]]', answers: ['Ep największa', 'Ek największa', 'Ep największa'], extra: ['Ek największa'],
+    hint: 'Skrajne położenia są najwyżej, środek – najszybszy.', expl: 'W skrajnych położeniach największa jest energia potencjalna (Ep), a w środku – kinetyczna (Ek).', anim: 'energy' },
+  { id: 'd66', mission: 'm5', concept: 'energia', level: 2, type: 'mc', q: 'Gdzie ciężarek na sprężynie ma największą energię kinetyczną?',
+    opts: ['przy przejściu przez położenie równowagi', 'w najniższym punkcie', 'w najwyższym punkcie', 'wszędzie taką samą'],
+    hint: 'Gdzie ciężarek porusza się najszybciej?', expl: 'Tak jak w wahadle: najszybciej jest w położeniu równowagi, a w skrajnych punktach na chwilę się zatrzymuje.', anim: 'spring' },
+  { id: 'd67', mission: 'm5', concept: 'energia', level: 3, type: 'mc', q: 'Dlaczego bez oporów ruchu wahadło huśtałoby się bez końca?',
+    opts: ['bo energia mechaniczna się nie zmienia – przechodzi z potencjalnej w kinetyczną i z powrotem', 'bo kulka jest ciężka', 'bo energia kinetyczna cały czas rośnie', 'bo Ziemia przyciąga kulkę w bok'],
+    hint: 'Pomyśl o sumie Ep + Ek.', expl: 'Bez oporów suma Ep + Ek jest stała. Energia tylko zmienia formę, więc ruch mógłby trwać bez końca.', anim: 'energy' },
+  { id: 'd68', mission: 'm5', concept: 'energia', level: 3, type: 'tf', answer: true, q: 'W połowie drogi między skrajnym położeniem a położeniem równowagi kulka ma i energię potencjalną, i kinetyczną.',
+    hint: 'Czy kulka jest tam w ruchu? Czy jest wyżej niż na dole?', expl: 'Tak: kulka jest jeszcze nad najniższym punktem (ma Ep) i już się porusza (ma Ek).', anim: 'energy' },
+
+  /* ---------- Misja 6: Tłumienie i rezonans ---------- */
+  { id: 'd70', mission: 'm6', concept: 'tlumienie', level: 1, type: 'mc', q: 'Dlaczego rozhuśtane wahadło w końcu się zatrzymuje?',
+    opts: ['opory ruchu (powietrze, tarcie) zamieniają jego energię mechaniczną na wewnętrzną', 'bo kończy mu się okres', 'bo Ziemia przestaje je przyciągać', 'bo masa kulki maleje'],
+    hint: 'Co przeszkadza kulce w ruchu?', expl: 'Opór powietrza i tarcie w zawieszeniu zabierają energię mechaniczną. Zamienia się ona w energię wewnętrzną (ogrzewa trochę otoczenie).', anim: 'damped' },
+  { id: 'd71', mission: 'm6', concept: 'tlumienie', level: 1, type: 'tf', answer: true, q: 'W drganiach tłumionych amplituda z czasem maleje.',
+    hint: 'Co się dzieje z wychyleniem wahadła, które zostawimy samo?', expl: 'Tak – drgania tłumione mają coraz mniejszą amplitudę, aż ciało się zatrzyma.', anim: 'damped' },
+  { id: 'd72', mission: 'm6', concept: 'tlumienie', level: 2, type: 'tf', answer: false, q: 'W drganiach tłumionych energia znika bez śladu.',
+    hint: 'Energia nie znika, tylko…', expl: 'Energia nie znika. Opory ruchu zamieniają ją na energię wewnętrzną powietrza i zawieszenia.' },
+  { id: 'd73', mission: 'm6', concept: 'rezonans', level: 1, type: 'mc', q: 'Jak najłatwiej rozhuśtać kolegę na huśtawce?',
+    opts: ['pchać w rytmie huśtawki, gdy odchyla się od nas', 'pchać jak najczęściej, bez rytmu', 'pchnąć raz, bardzo mocno', 'pchać, gdy huśtawka leci w naszą stronę'],
+    hint: 'Przypomnij sobie zabawę z huśtawką w eksperymencie.', expl: 'Pchnięcia w rytmie drgań huśtawki dodają energię za każdym razem. To rezonans.', anim: 'resonance' },
+  { id: 'd74', mission: 'm6', concept: 'rezonans', level: 2, type: 'mc', q: 'Rezonans to…',
+    opts: ['silny wzrost amplitudy, gdy pobudzamy ciało w rytmie jego drgań własnych', 'zatrzymywanie się drgań przez opór powietrza', 'zmiana okresu wahadła po wydłużeniu nici', 'dźwięk wydawany przez wahadło'],
+    hint: 'Pomyśl o huśtawce pchanej w dobrym rytmie.', expl: 'Gdy częstotliwość pobudzania jest równa częstotliwości drgań własnych, amplituda bardzo rośnie. To rezonans.', anim: 'resonance' },
+  { id: 'd75', mission: 'm6', concept: 'rezonans', level: 3, type: 'mc', q: 'Żołnierze, przechodząc przez most, nie maszerują równym krokiem. Dlaczego?',
+    opts: ['równy rytm kroków mógłby wywołać rezonans i bardzo duże drgania mostu', 'żeby szybciej przejść', 'bo most jest za krótki', 'żeby zmniejszyć masę mostu'],
+    hint: 'Równy krok to regularne „pchnięcia” mostu.', expl: 'Jeśli rytm kroków zgodziłby się z częstotliwością drgań własnych mostu, amplituda drgań mogłaby niebezpiecznie wzrosnąć.', anim: 'resonance' },
+  { id: 'd76', mission: 'm6', concept: 'tlumienie', level: 2, type: 'click', svg: SV.graphsDamped(), correct: ['B'],
+    q: 'Kliknij wykres, który pokazuje drgania tłumione.',
+    hint: 'W drganiach tłumionych wychylenia stają się coraz mniejsze.', expl: 'Wykres B: amplituda maleje z czasem. Wykres A to drgania bez tłumienia, a C – drgania narastające, np. przy rezonansie.', anim: 'damped' },
+  { id: 'd77', mission: 'm6', concept: 'rezonans', level: 3, type: 'slider', sim: 'driven', min: 0.2, max: 1, step: 0.05, init: 0.85, target: 0.5,
+    label: 'Rytm pchania', q: 'Ta huśtawka ma częstotliwość drgań własnych 0,5 Hz. Ustaw rytm pchania tak, aby rozhuśtała się najmocniej.',
+    check: v => Math.abs(v - 0.5) <= 0.051,
+    hintFn: v => v > 0.5 ? 'Pchasz za często. Zwolnij rytm.' : 'Pchasz za rzadko. Przyspiesz rytm.',
+    hint: 'Rezonans: pchaj z taką częstotliwością, z jaką huśtawka drga sama.', expl: 'Największe wychylenie jest przy rytmie 0,5 Hz – równym częstotliwości drgań własnych. To rezonans.', anim: 'resonance' },
+  { id: 'd78', mission: 'm6', concept: 'rezonans', level: 1, type: 'tf', answer: true, q: 'Huśtawka ma swoją własną częstotliwość drgań.',
+    hint: 'Huśtawka to coś w rodzaju dużego wahadła.', expl: 'Tak. Jak wahadło – zależy ona głównie od długości łańcuchów.' },
+  { id: 'd79', mission: 'm6', concept: 'tlumienie', level: 3, type: 'mc', q: 'Co dzieje się z okresem drgań tłumionego wahadła, gdy amplituda maleje?',
+    opts: ['prawie się nie zmienia', 'szybko maleje do zera', 'rośnie bez końca'], hint: 'Przypomnij sobie wykres z eksperymentu: odstępy między szczytami.',
+    expl: 'Maleje amplituda, ale odstępy między szczytami (okres) pozostają prawie takie same.', anim: 'damped' }
+];
+
+/* ----- Generatory zadań rachunkowych: losowe dane, żeby nie dało się ich „wykuć” ----- */
+const WHO = [['Wahadło zegara', 'wykonało'], ['Huśtawka', 'wykonała'], ['Ciężarek na sprężynie', 'wykonał'], ['Wahadło w pracowni', 'wykonało']];
+const WHO_FAST = [['Struna gitary', 'wykonała'], ['Skrzydełko owada', 'wykonało'], ['Kamerton', 'wykonał'], ['Membrana głośnika', 'wykonała']];
+const calcQ = (o) => Object.assign({ type: 'calc', fIdx: 0 }, o);
+const GEN = {
+  T_tn(d) {
+    let n, T, tMin = 0;
+    if (d === 1) { n = rnd([5, 10, 20]); T = rnd([0.5, 1, 2, 3]); }
+    else if (d === 2) { n = rnd([4, 8, 12, 15, 25]); T = rnd([0.4, 0.5, 0.8, 1.2, 1.5, 2.5]); }
+    else { [n, T] = rnd([[30, 2], [60, 1], [90, 2], [120, 0.5], [60, 2], [40, 1.5]]); tMin = n * T / 60; }
+    const t = n * T, [who, verb] = rnd(WHO), tTxt = tMin ? fmt(tMin) + ' min' : fmt(t) + ' s';
+    return calcQ({
+      q: `${who} ${verb} ${pelne(n)} w czasie ${tTxt}. Oblicz okres drgań.`, data: [['n', String(n)], ['t', tTxt]], find: 'T',
+      formulas: ['T = t / n', 'T = n / t', 'T = t · n'], answer: T, unit: 's',
+      hint: 'Okres to czas jednego drgania: cały czas dzielisz przez liczbę drgań.' + (tMin ? ' Najpierw zamień minuty na sekundy (1 min = 60 s).' : ''),
+      hintCalc: tMin ? 'Czy zamieniłaś minuty na sekundy?' : `Podziel ${fmt(t)} przez ${n}.`,
+      steps: [tMin ? `t = ${fmt(tMin)} min = ${fmt(t)} s` : null, 'Wzór: T = t / n', `Podstaw: T = ${fmt(t)} s / ${n}`].filter(Boolean),
+      expl: `${tMin ? `t = ${fmt(t)} s. ` : ''}T = t / n = ${fmt(t)} s / ${n} = ${fmt(T)} s.`
+    });
+  },
+  f_T(d) {
+    let T, ms = 0;
+    if (d === 1) T = rnd([0.5, 0.25, 0.2, 0.1]);
+    else if (d === 2) T = rnd([2, 4, 0.4, 0.8, 1.25]);
+    else { ms = rnd([20, 40, 50, 2, 5]); T = ms / 1000; }
+    const f = Math.round(1e6 / T) / 1e6, [who] = rnd(T < 0.2 ? WHO_FAST : WHO), Ttxt = ms ? ms + ' ms' : fmt(T) + ' s';
+    return calcQ({
+      q: `${who} drga z okresem ${Ttxt}. Oblicz częstotliwość drgań.`, data: [['T', Ttxt]], find: 'f',
+      formulas: ['f = 1 / T', 'f = T / 1', 'f = n / t'], answer: f, unit: 'Hz',
+      hint: 'Częstotliwość to odwrotność okresu.' + (ms ? ' Zamień milisekundy na sekundy: 1 ms = 0,001 s.' : ''),
+      hintCalc: ms ? `Czy zamieniłaś ${ms} ms na ${fmt(T)} s?` : `Policz 1 : ${fmt(T)}.`,
+      steps: [ms ? `T = ${ms} ms = ${fmt(T)} s` : null, 'Wzór: f = 1 / T', `Podstaw: f = 1 / ${fmt(T)} s`].filter(Boolean),
+      expl: `f = 1 / T = 1 / ${fmt(T)} s = ${fmt(f)} Hz.`
+    });
+  },
+  f_nt(d) {
+    let f, t, tMin = 0, n;
+    if (d === 1) { f = rnd([1, 2, 3, 4, 5]); t = rnd([4, 5, 10]); }
+    else if (d === 2) { do { f = rnd([0.5, 1.5, 2.5, 0.25, 0.8]); t = rnd([4, 6, 8, 10, 20, 5]); } while (Math.abs(f * t - Math.round(f * t)) > 1e-9); }
+    else { tMin = rnd([1, 2]); f = rnd([0.5, 1.5, 2, 4, 0.25]); t = tMin * 60; }
+    n = Math.round(f * t);
+    const [who, verb] = rnd(WHO), tTxt = tMin ? tMin + ' min' : fmt(t) + ' s';
+    return calcQ({
+      q: `${who} ${verb} ${pelne(n)} w czasie ${tTxt}. Oblicz częstotliwość drgań.`, data: [['n', String(n)], ['t', tTxt]], find: 'f',
+      formulas: ['f = n / t', 'f = t / n', 'f = n · t'], answer: f, unit: 'Hz',
+      hint: 'Częstotliwość to liczba drgań w jednej sekundzie.' + (tMin ? ' Najpierw zamień minuty na sekundy.' : ''),
+      hintCalc: tMin ? 'Czy zamieniłaś minuty na sekundy?' : `Podziel ${n} przez ${fmt(t)}.`,
+      steps: [tMin ? `t = ${tMin} min = ${t} s` : null, 'Wzór: f = n / t', `Podstaw: f = ${n} / ${fmt(t)} s`].filter(Boolean),
+      expl: `f = n / t = ${n} / ${fmt(t)} s = ${fmt(f)} Hz.`
+    });
+  },
+  T_f(d) {
+    const f = d === 1 ? rnd([2, 4, 5, 10]) : d === 2 ? rnd([0.5, 0.25, 0.8, 1.25, 2.5]) : rnd([50, 100, 200, 250, 500]);
+    const T = Math.round(1e6 / f) / 1e6, [who] = rnd(f >= 50 ? WHO_FAST : WHO);
+    return calcQ({
+      q: `${who} drga z częstotliwością ${fmt(f)} Hz. Oblicz okres drgań (w sekundach).`, data: [['f', fmt(f) + ' Hz']], find: 'T',
+      formulas: ['T = 1 / f', 'T = f / 1', 'T = t / n'], answer: T, unit: 's',
+      hint: 'Okres to odwrotność częstotliwości.', hintCalc: `Policz 1 : ${fmt(f)}.`,
+      steps: ['Wzór: T = 1 / f', `Podstaw: T = 1 / ${fmt(f)} Hz`], expl: `T = 1 / f = 1 / ${fmt(f)} Hz = ${fmt(T, 4)} s.`
+    });
+  },
+  n(d) {
+    const byF = d === 3 || (d === 2 && Math.random() < 0.5);
+    const [who] = rnd(WHO);
+    if (!byF) {
+      const T = rnd([0.5, 2, 1.5, 0.8]), n = rnd([10, 12, 20, 30]), t = n * T;
+      return calcQ({
+        q: `${who} drga z okresem ${fmt(T)} s. Ile pełnych drgań wykona w czasie ${fmt(t)} s?`, data: [['T', fmt(T) + ' s'], ['t', fmt(t) + ' s']], find: 'n',
+        formulas: ['n = t / T', 'n = T / t', 'n = t · T'], answer: n, unit: 'bez jednostki',
+        hint: 'Ile razy czas jednego drgania mieści się w całym czasie?', hintCalc: `Podziel ${fmt(t)} przez ${fmt(T)}.`,
+        steps: ['Wzór: n = t / T', `Podstaw: n = ${fmt(t)} s / ${fmt(T)} s`], expl: `n = t / T = ${fmt(t)} s / ${fmt(T)} s = ${n}. Liczba drgań nie ma jednostki.`
+      });
+    }
+    let f, t, tMin = 0;
+    if (d === 3) { tMin = 1; t = 60; f = rnd([2, 0.5, 1.5, 5]); } else { f = rnd([2, 5, 0.5, 1.5]); t = rnd([10, 20, 30]); }
+    const n = Math.round(f * t), tTxt = tMin ? '1 min' : t + ' s';
+    return calcQ({
+      q: `${who} drga z częstotliwością ${fmt(f)} Hz. Ile pełnych drgań wykona w czasie ${tTxt}?`, data: [['f', fmt(f) + ' Hz'], ['t', tTxt]], find: 'n',
+      formulas: ['n = f · t', 'n = f / t', 'n = t / f'], answer: n, unit: 'bez jednostki',
+      hint: `${fmt(f)} Hz to ${fmt(f)} drgania w każdej sekundzie.` + (tMin ? ' 1 min = 60 s.' : ''), hintCalc: `Pomnóż ${fmt(f)} przez ${t}.`,
+      steps: [tMin ? 't = 1 min = 60 s' : null, 'Wzór: n = f · t', `Podstaw: n = ${fmt(f)} Hz · ${t} s`].filter(Boolean),
+      expl: `n = f · t = ${fmt(f)} · ${t} = ${n}. Liczba drgań nie ma jednostki.`
+    });
+  }
+};
+Q_DRGANIA.push(
+  { id: 'g_T_tn', mission: 'm2', concept: 'obliczenia', level: 1, type: 'calc', gen: GEN.T_tn, title: 'Zadanie: okres z czasu i liczby drgań' },
+  { id: 'g_f_T', mission: 'm2', concept: 'obliczenia', level: 1, type: 'calc', gen: GEN.f_T, title: 'Zadanie: częstotliwość z okresu' },
+  { id: 'g_f_nt', mission: 'm2', concept: 'obliczenia', level: 2, type: 'calc', gen: GEN.f_nt, title: 'Zadanie: częstotliwość z liczby drgań i czasu' },
+  { id: 'g_T_f', mission: 'm2', concept: 'obliczenia', level: 2, type: 'calc', gen: GEN.T_f, title: 'Zadanie: okres z częstotliwości' },
+  { id: 'g_n', mission: 'm2', concept: 'obliczenia', level: 3, type: 'calc', gen: GEN.n, title: 'Zadanie: liczba drgań w danym czasie' }
+);
+
+/* ----- Eksperymenty modułu „Ruch drgający” -----
+   Każdy eksperyment: function(host, api) – dokłada elementy do host,
+   a po osiągnięciu celu woła api.goal('opis'). Animacje same się sprzątają. */
+const EXP_DRGANIA = {
+  /* Misja 1: huśtawka – zatrzymaj w położeniu równowagi i w skrajnym położeniu */
+  swing(host, api) {
+    const L = 2.5, T = periodPendulum(L), th0 = 0.42, st = { paused: !animOn() };
+    let t = 0, frozen = false;
+    const show = { eq: false, x: false, amp: false };
+    const cv = h('canvas', { class: 'sim', role: 'img', 'aria-label': 'Huśtawka poruszająca się tam i z powrotem' });
+    const tg = (key, label) => { const b = h('button', { class: 'toggle', type: 'button', 'aria-pressed': 'false' }, label); b.addEventListener('click', () => { show[key] = !show[key]; b.setAttribute('aria-pressed', String(show[key])); }); return b; };
+    const ratio = () => Math.abs(Math.cos(2 * Math.PI * t / T));
+    host.append(say('Patrz na huśtawkę i naciśnij „Stop!” we właściwym momencie. Bez pośpiechu – możesz próbować ile chcesz.'), cv,
+      h('div', { class: 'row wrap' }, playToggle(st), tg('eq', 'Położenie równowagi'), tg('x', 'Wychylenie'), tg('amp', 'Amplituda')),
+      stopChallenge({
+        freeze: v => { frozen = v; }, ratio,
+        tasks: [
+          { text: 'Wyzwanie 1 z 2: zatrzymaj huśtawkę w położeniu równowagi – na samym dole, w środku.', test: r => r < 0.25, ok: 'Tak! To położenie równowagi – tu huśtawka wisiałaby spokojnie.',
+            miss: r => r > 0.7 ? 'Huśtawka była blisko skrajnego położenia. Poczekaj, aż przeleci przez środek.' : 'Blisko! Jeszcze chwilę bliżej środka.' },
+          { text: 'Wyzwanie 2 z 2: zatrzymaj huśtawkę w skrajnym położeniu – tam, gdzie na chwilę zwalnia.', test: r => r > 0.88, ok: 'Świetnie! W skrajnym położeniu wychylenie jest największe – to amplituda.',
+            miss: () => 'Jeszcze nie skrajne położenie. Naciśnij, gdy huśtawka prawie stoi.' }
+        ],
+        onDone: () => api.goal('Wyzwania zaliczone! Włącz podpisy i zobacz nazwy.')
+      }));
+    Loop.add(dt => {
+      if (!frozen && !st.paused) t += dt;
+      const { ctx, w, h: H } = fit(cv), px = w / 2, py = 30, len = Math.min(H - 110, w * 0.75), ground = H - 14;
+      const th = th0 * Math.cos(2 * Math.PI * t / T);
+      const seat = drawSwing(ctx, px, py, len, th, ground);
+      const ax = py + len + 34, xr = px + len * Math.sin(th0), xl = px - len * Math.sin(th0);
+      if (show.eq) { dash(ctx, px, py, px, ax + 8, COL.primary); txt(ctx, 'położenie równowagi (O)', px, ax + 22, { size: 13, color: COL.primary }); }
+      if (show.amp) {
+        dash(ctx, xr, py + len * Math.cos(th0) + 10, xr, ax + 4, COL.lilac); dash(ctx, xl, py + len * Math.cos(th0) + 10, xl, ax + 4, COL.lilac, 1);
+        arrow(ctx, px, ax, xr, ax, COL.lilac, true); txt(ctx, 'amplituda A', (px + xr) / 2 + 8, ax - 11, { size: 13, color: COL.lilac });
+      }
+      if (show.x) { arrow(ctx, px, seat.y + 20, seat.x, seat.y + 20, COL.accent, false, 3); txt(ctx, 'wychylenie', seat.x, seat.y + 36, { size: 13, color: COL.accent }); }
+    }, cv);
+  },
+
+  /* Misja 2: zegar z wahadłem – stoper, licznik drgań, obliczenie T i f */
+  clock(host, api) {
+    const Tset = rnd([1.2, 1.5, 2]), th0 = 0.32, st = { paused: !animOn() };
+    const L = G * (Tset / 2 / Math.PI) ** 2;
+    let ph = 0, armed = false, running = false, meas = 0, n = 0;
+    const cv = h('canvas', { class: 'sim', role: 'img', 'aria-label': 'Wahadło zegara z licznikiem drgań' });
+    const tOut = h('span', { class: 'digits' }, '0,00 s'), nOut = h('span', { class: 'digits' }, '0');
+    const bStart = h('button', { class: 'btn primary', type: 'button' }, 'Start pomiaru');
+    const bStop = h('button', { class: 'btn ghost', type: 'button', disabled: true }, 'Stop');
+    const info = h('p', { class: 'small', 'aria-live': 'polite' }, 'Naciśnij „Start pomiaru”. Stoper ruszy, gdy kulka dojdzie do prawego skrajnego położenia.');
+    const res = h('div', { class: 'card', hidden: true });
+    host.append(say('Zmierzymy okres tak jak w pracowni: liczymy pełne drgania i mierzymy ich czas.'), cv,
+      h('div', { class: 'row wrap between' }, h('div', { class: 'stack', style: 'gap:0' }, h('span', { class: 'small muted' }, 'Stoper'), tOut), h('div', { class: 'stack', style: 'gap:0' }, h('span', { class: 'small muted' }, 'Pełne drgania'), nOut), playToggle(st)),
+      h('div', { class: 'row wrap' }, bStart, bStop), info, res);
+    bStart.addEventListener('click', () => { armed = true; running = false; meas = 0; n = 0; res.hidden = true; bStop.disabled = true; info.textContent = 'Czekam na skrajne położenie…'; });
+    bStop.addEventListener('click', () => { running = false; armed = false; bStop.disabled = true; showResult(); });
+    function showResult() {
+      const tFull = Math.round(n * Tset * 100) / 100;
+      info.textContent = '';
+      const iT = h('input', { class: 'numin', id: 'expT', type: 'text', inputmode: 'decimal', autocomplete: 'off' });
+      const iF = h('input', { class: 'numin', id: 'expF', type: 'text', inputmode: 'decimal', autocomplete: 'off' });
+      const fb = h('p', { 'aria-live': 'polite' });
+      const check = () => {
+        const vT = parseNum(iT.value), vF = parseNum(iF.value), f = 1 / Tset;
+        const okT = Math.abs(vT - Tset) <= Math.max(0.02, Tset * 0.03), okF = Math.abs(vF - f) <= Math.max(0.02, f * 0.03);
+        iT.classList.toggle('okv', okT); iF.classList.toggle('okv', okF);
+        if (okT && okF) { fb.textContent = `Brawo! T = ${fmt(Tset, 2)} s, f ≈ ${fmt(f, 2)} Hz.`; api.goal('Wyznaczyłaś okres i częstotliwość z własnego pomiaru!'); }
+        else if (!okT) fb.textContent = `Okres: podziel czas przez liczbę drgań: ${fmt(tFull, 2)} s / ${n}.`;
+        else fb.textContent = 'Okres dobrze! Częstotliwość: f = 1 / T.';
+      };
+      [iT, iF].forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') check(); }));
+      res.innerHTML = '';
+      res.append(h('p', {}, `Zmierzone: n = ${n}, t = ${fmt(tFull, 2)} s (do końca ostatniego pełnego drgania).`),
+        h('div', { class: 'row wrap' }, h('label', { for: 'expT', class: 'lbl' }, 'T = t / n ='), iT, 's'),
+        h('div', { class: 'row wrap' }, h('label', { for: 'expF', class: 'lbl' }, 'f = 1 / T ='), iF, 'Hz'),
+        h('div', { class: 'row wrap' }, h('button', { class: 'btn primary', type: 'button', onclick: check }, 'Sprawdź obliczenia')), fb);
+      res.hidden = false;
+    }
+    Loop.add(dt => {
+      if (!st.paused) {
+        const before = Math.floor(ph / Tset); ph += dt; const after = Math.floor(ph / Tset);
+        if (armed && !running && after > before) { running = true; meas = ph - after * Tset; info.textContent = 'Pomiar trwa. Zatrzymaj po co najmniej 3 drganiach.'; }
+        else if (running) {
+          meas += dt; const nn = Math.floor(meas / Tset + 1e-9);
+          if (nn !== n) { n = nn; Sound.play('tap'); }
+          if (n >= 3) bStop.disabled = false;
+          if (n >= 10) { running = false; armed = false; bStop.disabled = true; showResult(); }
+        }
+      }
+      tOut.textContent = fmt(running ? meas : n * Tset, 2).replace(/^(\d+)$/, '$1,00') + ' s'; nOut.textContent = String(n);
+      const { ctx, w, h: H } = fit(cv), px = w / 2, py = 30;
+      ctx.strokeStyle = COL.line; ctx.lineWidth = 4; rr(ctx, px - 80, 10, 160, H - 20, 18); ctx.stroke();
+      drawPendulum(ctx, px, py, Math.min(H - 80, 30 + (H - 110) * L / 1), th0 * Math.cos(2 * Math.PI * ph / Tset), 15);
+    }, cv);
+  },
+
+  /* Misja 3: laboratorium wahadła – suwaki długości, masy, wychylenia; notatnik pomiarów */
+  lab(host, api) {
+    let L = 1, m = 0.2, A = 10, ph = 0; const st = { paused: !animOn() }, rows = [], found = new Set();
+    const cv = h('canvas', { class: 'sim', role: 'img', 'aria-label': 'Wahadło w laboratorium' });
+    const out = h('p', { class: 'readout' });
+    const tip = say('Zasada badaczki: zmieniaj jedną rzecz naraz. Potem kliknij „Zapisz pomiar”.');
+    const tbody = h('tbody');
+    const Tn = () => periodPendulum(L);
+    function save() {
+      const r = { L, m, A, T: Tn() }, prev = rows[rows.length - 1]; rows.push(r);
+      S.measurements++; persist(); checkBadges();
+      tbody.prepend(h('tr', {}, h('td', {}, fmt(L, 2) + ' m'), h('td', {}, fmt(m, 2) + ' kg'), h('td', {}, A + '°'), h('td', {}, fmt(r.T, 2) + ' s')));
+      if (!prev) return tip.set('Pierwszy pomiar zapisany. Zmień teraz jedną rzecz i zapisz znowu.');
+      const ch = []; if (Math.abs(r.L - prev.L) > 1e-9) ch.push('L'); if (Math.abs(r.m - prev.m) > 1e-9) ch.push('m'); if (r.A !== prev.A) ch.push('A');
+      let msg;
+      if (!ch.length) msg = 'Te same ustawienia co poprzednio. Zmień jedną rzecz.';
+      else if (ch.length > 1) msg = 'Zmieniłaś kilka rzeczy naraz – nie wiadomo, która zmieniła okres. Spróbuj zmieniać jedną.';
+      else {
+        found.add(ch[0]);
+        msg = { L: r.L > prev.L ? 'Dłuższa nić → dłuższy okres. Wahadło waha się wolniej.' : 'Krótsza nić → krótszy okres. Wahadło waha się szybciej.',
+          m: 'Inna masa, a okres ten sam! Masa kulki nie zmienia okresu wahadła.',
+          A: 'Inne wychylenie, a okres praktycznie ten sam (przy małych wychyleniach).' }[ch[0]];
+        const left = ['L', 'm', 'A'].filter(x => !found.has(x)).map(x => ({ L: 'długość', m: 'masę', A: 'wychylenie' }[x]));
+        if (left.length) msg += ' Sprawdź jeszcze: ' + left.join(', ') + '.';
+      }
+      tip.set(msg);
+      if (found.size === 3) api.goal('Odkryłaś, co wpływa na okres wahadła, a co nie!');
+    }
+    host.append(tip, cv, out,
+      sliderRow('labL', 'Długość nici', 0.2, 2, 0.05, L, v => fmt(v, 2) + ' m', v => { L = v; }),
+      sliderRow('labM', 'Masa kulki', 0.05, 1, 0.05, m, v => fmt(v, 2) + ' kg', v => { m = v; }),
+      sliderRow('labA', 'Wychylenie początkowe', 3, 15, 1, A, v => v + '°', v => { A = v; }),
+      h('div', { class: 'row wrap' }, h('button', { class: 'btn primary', type: 'button', onclick: save }, 'Zapisz pomiar'), playToggle(st)),
+      h('div', { class: 'tbl-wrap' }, h('table', {}, h('caption', { class: 'small muted', style: 'text-align:left' }, 'Notatnik pomiarów (najnowszy na górze)'),
+        h('thead', {}, h('tr', {}, h('th', {}, 'Długość'), h('th', {}, 'Masa'), h('th', {}, 'Wychylenie'), h('th', {}, 'Okres'))), tbody)));
+    let lastTxt = '';
+    Loop.add(dt => {
+      if (!st.paused) ph += dt * 2 * Math.PI / Tn();
+      const { ctx, w, h: H } = fit(cv), px = w / 2, py = 26, len = 20 + (H - 70) * (L / 2), a = A * Math.PI / 180;
+      drawCeiling(ctx, px, py, 140);
+      ctx.strokeStyle = COL.line; ctx.lineWidth = 1.5; ctx.setLineDash([3, 5]); ctx.beginPath(); ctx.arc(px, py, len, Math.PI / 2 - a, Math.PI / 2 + a); ctx.stroke(); ctx.setLineDash([]);
+      drawPendulum(ctx, px, py, len, a * Math.cos(ph), 8 + 10 * Math.cbrt(m));
+      const s = `Okres T ≈ ${fmt(Tn(), 2)} s  ·  Częstotliwość f ≈ ${fmt(1 / Tn(), 2)} Hz`;
+      if (s !== lastTxt) { out.textContent = s; lastTxt = s; }
+    }, cv);
+  },
+
+  /* Misja 4: trampolina-sprężyna – masa i sztywność */
+  spring(host, api) {
+    let m = 0.4, k = 30, ph = 0, slow = false; const st = { paused: !animOn() }, rows = [], found = new Set();
+    const cv = h('canvas', { class: 'sim', role: 'img', 'aria-label': 'Ciężarek drgający na sprężynie' });
+    const out = h('p', { class: 'readout' });
+    const tip = say('Zmień masę albo sztywność sprężyny i zapisz pomiar. Patrz, jak zmienia się okres.');
+    const tbody = h('tbody');
+    const Tn = () => periodSpring(m, k);
+    const bSlow = h('button', { class: 'toggle', type: 'button', 'aria-pressed': 'false' }, 'Zwolnione tempo ×4');
+    bSlow.addEventListener('click', () => { slow = !slow; bSlow.setAttribute('aria-pressed', String(slow)); });
+    function save() {
+      const r = { m, k, T: Tn() }, prev = rows[rows.length - 1]; rows.push(r);
+      S.measurements++; persist(); checkBadges();
+      tbody.prepend(h('tr', {}, h('td', {}, fmt(m, 2) + ' kg'), h('td', {}, k + ' N/m'), h('td', {}, fmt(r.T, 2) + ' s')));
+      if (!prev) return tip.set('Zapisane. Zmień jedną rzecz i zapisz znowu.');
+      const dm = Math.abs(r.m - prev.m) > 1e-9, dk = r.k !== prev.k;
+      if (dm && dk) return tip.set('Zmieniłaś dwie rzeczy naraz. Zmieniaj jedną – wtedy widać, co działa.');
+      if (!dm && !dk) return tip.set('Te same ustawienia. Zmień masę albo sprężynę.');
+      if (dm) { found.add('m'); tip.set(r.m > prev.m ? 'Większa masa → dłuższy okres. Ciężarek drga wolniej.' : 'Mniejsza masa → krótszy okres. Ciężarek drga szybciej.'); }
+      else { found.add('k'); tip.set(r.k > prev.k ? 'Sztywniejsza sprężyna → krótszy okres. Drgania szybsze.' : 'Miększa sprężyna → dłuższy okres. Drgania wolniejsze.'); }
+      if (found.size === 2) api.goal('Wiesz już, jak masa i sztywność sprężyny wpływają na okres!');
+    }
+    host.append(tip, cv, out,
+      sliderRow('sprM', 'Masa ciężarka', 0.1, 1, 0.05, m, v => fmt(v, 2) + ' kg', v => { m = v; }),
+      sliderRow('sprK', 'Sztywność sprężyny', 10, 60, 5, k, v => v + ' N/m' + (v <= 20 ? ' (miękka)' : v >= 45 ? ' (sztywna)' : ''), v => { k = v; }),
+      h('div', { class: 'row wrap' }, h('button', { class: 'btn primary', type: 'button', onclick: save }, 'Zapisz pomiar'), playToggle(st), bSlow),
+      h('div', { class: 'tbl-wrap' }, h('table', {}, h('thead', {}, h('tr', {}, h('th', {}, 'Masa'), h('th', {}, 'Sztywność'), h('th', {}, 'Okres'))), tbody)),
+      h('p', { class: 'small muted' }, 'Sztywność mówi, jak mocno sprężyna się opiera: N/m to niutony na każdy metr rozciągnięcia.'));
+    let lastTxt = '';
+    Loop.add(dt => {
+      if (!st.paused) ph += dt * (slow ? 0.25 : 1) * 2 * Math.PI / Tn();
+      const { ctx, w, h: H } = fit(cv); drawSpringScene(ctx, w, H, m, k, Math.cos(ph));
+      const s = `Okres T ≈ ${fmt(Tn(), 2)} s  ·  Częstotliwość f ≈ ${fmt(1 / Tn(), 2)} Hz`;
+      if (s !== lastTxt) { out.textContent = s; lastTxt = s; }
+    }, cv);
+  },
+
+  /* Misja 5: energia – paski Ep i Ek zmieniające się w czasie */
+  energy(host, api) {
+    const L = 1, T = periodPendulum(L), th0 = 0.55, st = { paused: !animOn() };
+    let t = 0, frozen = false, slow = false;
+    const cv = h('canvas', { class: 'sim', role: 'img', 'aria-label': 'Wahadło z zaznaczoną prędkością kulki' });
+    const bar = (label, color) => { const f = h('div', { class: 'fill', style: `background:${color};width:0%` }), o = h('output', {}, '0%'); return { el: h('div', { class: 'ebar' }, h('span', { class: 'lbl' }, label), h('div', { class: 'track' }, f), o), f, o }; };
+    const bEp = bar('Energia potencjalna', 'var(--lilac)'), bEk = bar('Energia kinetyczna', 'var(--accent)'), bE = bar('Razem', 'var(--primary)');
+    const bSlow = h('button', { class: 'toggle', type: 'button', 'aria-pressed': 'false' }, 'Zwolnione tempo');
+    bSlow.addEventListener('click', () => { slow = !slow; bSlow.setAttribute('aria-pressed', String(slow)); });
+    const ratio = () => Math.abs(Math.cos(2 * Math.PI * t / T));
+    host.append(say('Obserwuj paski: suma energii się nie zmienia, zmienia się tylko jej forma.'), cv,
+      h('div', { class: 'stack', style: 'gap:.5rem' }, bEp.el, bEk.el, bE.el),
+      h('div', { class: 'row wrap' }, playToggle(st), bSlow),
+      stopChallenge({
+        freeze: v => { frozen = v; }, ratio,
+        tasks: [
+          { text: 'Wyzwanie 1 z 2: zatrzymaj wahadło, gdy energia kinetyczna jest największa.', test: r => r < 0.25, ok: 'Tak! W położeniu równowagi kulka jest najszybsza – Ek największa.', miss: () => 'Spójrz na pomarańczowy pasek – ma być prawie pełny.' },
+          { text: 'Wyzwanie 2 z 2: zatrzymaj wahadło, gdy energia potencjalna jest największa.', test: r => r > 0.9, ok: 'Świetnie! W skrajnym położeniu kulka jest najwyżej i na chwilę staje.', miss: () => 'Fioletowy pasek ma być prawie pełny – czekaj na skrajne położenie.' }
+        ],
+        onDone: () => api.goal('Wiesz, gdzie której energii jest najwięcej!')
+      }));
+    Loop.add(dt => {
+      if (!frozen && !st.paused) t += dt * (slow ? 0.35 : 1);
+      const ph = 2 * Math.PI * t / T, th = th0 * Math.cos(ph), om = -th0 * Math.sin(ph);
+      const ep = (1 - Math.cos(th)) / (1 - Math.cos(th0)), ek = Math.max(0, 1 - ep);
+      [[bEp, ep], [bEk, ek], [bE, 1]].forEach(([b, v]) => { b.f.style.width = (v * 100).toFixed(1) + '%'; b.o.textContent = Math.round(v * 100) + '%'; });
+      const { ctx, w, h: H } = fit(cv), px = w / 2, py = 26, len = H - 66;
+      drawCeiling(ctx, px, py, 140);
+      dash(ctx, px - len * Math.sin(th0) - 30, py + len * Math.cos(th0), px + len * Math.sin(th0) + 30, py + len * Math.cos(th0), COL.line, 1);
+      dash(ctx, px - 60, py + len, px + 60, py + len, COL.line, 1);
+      const b = drawPendulum(ctx, px, py, len, th, 14);
+      const v = om * 60; if (Math.abs(v) > 3) arrow(ctx, b.x, b.y, b.x + v * Math.cos(th), b.y - v * Math.sin(th), COL.accent, false, 3);
+      txt(ctx, 'strzałka = prędkość kulki', px, H - 10, { size: 12, color: COL.muted, weight: 400 });
+    }, cv);
+  },
+
+  /* Misja 6: rezonans (pchanie huśtawki) i tłumienie (opór powietrza) */
+  damp(host, api) {
+    const tabs = h('div', { class: 'tabs', role: 'tablist', 'aria-label': 'Części eksperymentu' });
+    const pA = h('div', { class: 'stack', role: 'tabpanel', id: 'panRes' }), pB = h('div', { class: 'stack', role: 'tabpanel', id: 'panDamp', hidden: true });
+    const tA = h('button', { role: 'tab', type: 'button', 'aria-selected': 'true', 'aria-controls': 'panRes' }, 'Rezonans: huśtawka');
+    const tB = h('button', { role: 'tab', type: 'button', 'aria-selected': 'false', 'aria-controls': 'panDamp' }, 'Tłumienie: wahadło');
+    const sel = a => { tA.setAttribute('aria-selected', String(a)); tB.setAttribute('aria-selected', String(!a)); pA.hidden = !a; pB.hidden = a; };
+    tA.addEventListener('click', () => sel(true)); tB.addEventListener('click', () => sel(false));
+    tabs.append(tA, tB); host.append(tabs, pA, pB);
+    let resDone = false, dampSeen = false;
+    const maybeGoal = () => { if (resDone && dampSeen) api.goal('Znasz już rezonans i tłumienie!'); };
+
+    // --- rezonans: równanie ruchu θ'' = −ω0²θ − 2βθ', pchnięcie dodaje prędkość do przodu
+    const w0 = 2 * Math.PI / 2.4, beta = 0.06, target = 0.44;
+    let th = 0.05, om = 0, pushes = 0, flash = 0, showRhythm = true;
+    const cvA = h('canvas', { class: 'sim', role: 'img', 'aria-label': 'Huśtawka, którą rozkołysujesz pchnięciami' });
+    const fbA = h('p', { 'aria-live': 'polite' }, 'Stoisz po lewej stronie. Pchaj huśtawkę, gdy odchyla się od ciebie.');
+    const meter = h('div', { class: 'progress', style: 'height:16px' }, h('i', { style: 'width:0%;background:var(--accent)' }));
+    const bPush = h('button', { class: 'btn primary big', type: 'button' }, 'Pchnij!');
+    const bRh = h('button', { class: 'toggle', type: 'button', 'aria-pressed': 'true' }, 'Podpowiedź rytmu');
+    bRh.addEventListener('click', () => { showRhythm = !showRhythm; bRh.setAttribute('aria-pressed', String(showRhythm)); });
+    function push() {
+      pushes++; flash = 0.35; Sound.play('push');
+      if (Math.abs(om) < 0.3 && th < 0) fbA.textContent = 'Idealny moment! Huśtawka właśnie zawracała.';
+      else if (om > 0) fbA.textContent = 'Dobre pchnięcie – huśtawka leciała od ciebie.';
+      else fbA.textContent = 'Huśtawka leciała w twoją stronę – pchnięcie ją przyhamowało. Poczekaj na dobry moment.';
+      om += 0.2;
+    }
+    bPush.addEventListener('click', push);
+    onKey(e => { if (!pA.hidden && (e.key === 'p' || e.key === 'P') && !isTyping(e)) push(); }, cvA);
+    pA.append(say('Rezonans: małe pchnięcia w rytmie huśtawki dają duże wychylenie.'), cvA,
+      h('div', { class: 'stack', style: 'gap:.3rem' }, h('span', { class: 'small muted' }, 'Wychylenie (cel: kreska na końcu paska)'), meter),
+      h('div', { class: 'row wrap' }, bPush, bRh), fbA, h('p', { class: 'small muted' }, 'Skrót klawiszowy: P – pchnij.'));
+    Loop.add(dt => {
+      if (!pA.hidden) {
+        for (let i = 0; i < 4; i++) { const d = dt / 4, a = -w0 * w0 * th - 2 * beta * om; om += a * d; th += om * d; }
+        let amp = Math.hypot(th, om / w0); if (amp > 0.9) { th *= 0.9 / amp; om *= 0.9 / amp; amp = 0.9; }
+        meter.firstChild.style.width = Math.min(100, amp / target * 100).toFixed(1) + '%';
+        if (!resDone && amp >= target) { resDone = true; S.flags.rezonans = true; persist(); checkBadges(); fbA.textContent = `Udało się po ${pushes} pchnięciach! Pchałaś w rytmie drgań własnych huśtawki – to rezonans.`; maybeGoal(); }
+        flash = Math.max(0, flash - dt);
+      }
+      const { ctx, w, h: H } = fit(cvA), px = w / 2, py = 28, len = H - 90;
+      const seat = drawSwing(ctx, px, py, len, th, H - 16);
+      if (showRhythm && th < -0.03 && Math.abs(om) < 0.35) { ctx.fillStyle = COL.ok; ctx.beginPath(); ctx.arc(seat.x - 42, seat.y - 4, 9, 0, Math.PI * 2); ctx.fill(); txt(ctx, 'teraz!', seat.x - 42, seat.y - 24, { size: 13, color: COL.ok }); }
+      if (flash > 0) arrow(ctx, seat.x - 58, seat.y, seat.x - 32, seat.y, COL.accent, false, 5);
+    }, cvA);
+
+    // --- tłumienie: θ = θ0·e^(−βt)·cos(ωt), wykres wychylenia z obwiednią
+    let tb = 0, bD = 0.15; const hist = [];
+    const cvB = h('canvas', { class: 'sim mini', role: 'img', 'aria-label': 'Wahadło z oporem powietrza' });
+    const cvG = h('canvas', { class: 'sim mini', role: 'img', 'aria-label': 'Wykres wychylenia wahadła od czasu' });
+    pB.append(say('Drgania tłumione: amplituda maleje, a energia zamienia się w energię wewnętrzną powietrza i zawieszenia.'), cvB,
+      sliderRow('dampB', 'Opór powietrza', 0, 0.6, 0.05, bD, v => v === 0 ? 'brak (idealnie)' : v < 0.2 ? 'mały' : v < 0.4 ? 'średni' : 'duży', v => { bD = v; tb = 0; hist.length = 0; dampSeen = true; maybeGoal(); }),
+      h('div', { class: 'row wrap' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => { tb = 0; hist.length = 0; } }, 'Puść wahadło jeszcze raz')),
+      cvG, h('p', { class: 'small muted' }, 'Zwróć uwagę: odstępy między szczytami (okres) prawie się nie zmieniają.'));
+    tB.addEventListener('click', () => { setTimeout(() => { dampSeen = true; maybeGoal(); }, 8000); });
+    const wD = Math.sqrt(G / 1), A0 = 0.5;
+    Loop.add(dt => {
+      if (pB.hidden) return;
+      if (animOn()) { tb += dt; hist.push([tb, A0 * Math.exp(-bD * tb) * Math.cos(wD * tb)]); while (hist.length && hist[0][0] < tb - 14) hist.shift(); }
+      const thb = A0 * Math.exp(-bD * tb) * Math.cos(wD * tb);
+      let { ctx, w, h: H } = fit(cvB);
+      drawCeiling(ctx, w / 2, 24, 120); drawPendulum(ctx, w / 2, 24, H - 60, thb, 13);
+      ({ ctx, w, h: H } = fit(cvG));
+      const x0 = 30, y0 = H / 2, sx = (w - x0 - 10) / 14, sy = (H / 2 - 14) / A0, tStart = Math.max(0, tb - 14);
+      ctx.strokeStyle = COL.ink; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(x0, 8); ctx.lineTo(x0, H - 8); ctx.moveTo(x0, y0); ctx.lineTo(w - 6, y0); ctx.stroke();
+      txt(ctx, 'x', x0 - 14, 14, {}); txt(ctx, 't', w - 12, y0 + 14, {});
+      ctx.save(); ctx.setLineDash([4, 5]); ctx.strokeStyle = COL.lilac; ctx.lineWidth = 1.5;
+      [1, -1].forEach(sg => { ctx.beginPath(); for (let i = 0; i <= 14; i += 0.25) { const tt = tStart + i; ctx.lineTo(x0 + i * sx, y0 - sg * A0 * Math.exp(-bD * tt) * sy); } ctx.stroke(); });
+      ctx.restore();
+      ctx.strokeStyle = COL.primary; ctx.lineWidth = 2.5; ctx.beginPath();
+      hist.forEach(([tt, v], i) => { const X = x0 + (tt - tStart) * sx, Y = y0 - v * sy; i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); }); ctx.stroke();
+    }, cvB);
+  }
+};
+
+/* ----- Rejestracja modułu 1 ----- */
+registerModule({
+  id: 'drgania', short: 'Moduł 1', title: 'Ruch drgający',
+  concepts: { drganie: 'Czym jest ruch drgający', rownowaga: 'Położenie równowagi', amplituda: 'Wychylenie i amplituda', okres: 'Okres drgań', czestotliwosc: 'Częstotliwość', jednostki: 'Jednostki', wzory: 'Wzory na T i f', obliczenia: 'Zadania rachunkowe', wahadlo: 'Wahadło', sprezyna: 'Ciężarek na sprężynie', energia: 'Przemiany energii', tlumienie: 'Drgania tłumione', rezonans: 'Rezonans' },
+  experiments: EXP_DRGANIA,
+  questions: Q_DRGANIA,
+  missions: [
+    { id: 'm1', title: 'Co to jest drganie?', place: 'Huśtawka', icon: 'swing', requires: [], experiment: 'swing', expTitle: 'Zatrzymaj huśtawkę we właściwym miejscu', core: ['d01', 'd02'],
+      intro: [{ text: 'Witaj w Parku Drgań! Każda atrakcja tutaj coś drga: huśtawki, zegary, sprężyny, struny.', anim: 'swing' },
+        { text: 'Huśtawka porusza się tam i z powrotem wokół jednego miejsca. To ruch drgający.', anim: 'swing' },
+        { text: 'Tam, gdzie huśtawka wisi spokojnie, jest położenie równowagi (O). Największe wychylenie od niego to amplituda (A).', anim: 'swinglabels' }],
+      learned: ['Ruch drgający to ruch tam i z powrotem wokół położenia równowagi.', 'Wychylenie ciągle się zmienia; jego największa wartość to amplituda.', 'Pełne drganie: A → O → B → O → A.'] },
+    { id: 'm2', title: 'Okres i częstotliwość', place: 'Zegar z wahadłem', icon: 'clock', requires: ['m1'], experiment: 'clock', expTitle: 'Zmierz okres wahadła zegara', core: ['d20', 'g_T_tn'],
+      intro: [{ text: 'Zegar z wahadłem chodzi równo, bo każde wahnięcie trwa tyle samo.', anim: 'clock' },
+        { text: 'Okres T to czas jednego pełnego drgania (tam i z powrotem). Mierzymy go w sekundach.', anim: 'clock' },
+        { text: 'Częstotliwość f to liczba drgań w 1 sekundzie. Jednostka: herc (Hz). Wzór: f = 1 / T.', anim: 'graph' }],
+      learned: ['Okres T – czas jednego drgania, w sekundach.', 'Częstotliwość f – liczba drgań w 1 s, w hercach.', 'f = 1 / T,  T = t / n,  f = n / t.'] },
+    { id: 'm3', title: 'Wahadło – laboratorium', place: 'Laboratorium wahadeł', icon: 'flask', requires: ['m2'], experiment: 'lab', expTitle: 'Od czego zależy okres wahadła?', core: ['d42', 'd40'],
+      intro: [{ text: 'W laboratorium sprawdzisz, od czego zależy okres wahadła: od długości, masy czy wychylenia?', anim: 'lab' },
+        { text: 'Zasada badaczki: zmieniaj jedną rzecz naraz, a resztę zostaw bez zmian.' }],
+      learned: ['Dłuższe wahadło – dłuższy okres.', 'Masa kulki nie zmienia okresu.', 'Przy małych wychyleniach amplituda nie zmienia okresu.'] },
+    { id: 'm4', title: 'Sprężyna', place: 'Trampolina', icon: 'spring', requires: ['m2'], experiment: 'spring', expTitle: 'Ciężarek na sprężynie', core: ['d50', 'd52'],
+      intro: [{ text: 'Trampolina działa jak sprężyna: rozciągnięta, wraca i drga.', anim: 'spring' },
+        { text: 'Sprawdzisz, jak masa ciężarka i sztywność sprężyny wpływają na okres.' }],
+      learned: ['Większa masa ciężarka – dłuższy okres.', 'Sztywniejsza sprężyna – krótszy okres.', 'Tu masa ma znaczenie, inaczej niż w wahadle.'] },
+    { id: 'm5', title: 'Energia w ruchu', place: 'Wielkie wahadło', icon: 'bolt', requires: ['m2'], experiment: 'energy', expTitle: 'Paski energii', core: ['d60', 'd65'],
+      intro: [{ text: 'W skrajnym położeniu kulka na chwilę staje i jest najwyżej: ma najwięcej energii potencjalnej.', anim: 'energy' },
+        { text: 'W położeniu równowagi pędzi najszybciej: ma najwięcej energii kinetycznej.', anim: 'energy' },
+        { text: 'Energia cały czas zmienia formę: potencjalna ↔ kinetyczna.' }],
+      learned: ['Skrajne położenie: v = 0, energia potencjalna największa.', 'Położenie równowagi: prędkość i energia kinetyczna największe.', 'Bez oporów suma Ep + Ek się nie zmienia.'] },
+    { id: 'm6', title: 'Tłumienie i rezonans', place: 'Most i sejsmograf', icon: 'bridge', requires: ['m2'], experiment: 'damp', expTitle: 'Rozhuśtaj huśtawkę i zatrzymaj wahadło', core: ['d70', 'd73'],
+      intro: [{ text: 'Prawdziwe wahadło w końcu staje. Opór powietrza i tarcie zabierają mu energię. To drgania tłumione.', anim: 'damped' },
+        { text: 'Gdy pchasz huśtawkę w jej własnym rytmie, rozkołysze się bardzo mocno. To rezonans. Dlatego inżynierowie pilnują, by mosty nie wpadały w rezonans.', anim: 'resonance' }],
+      learned: ['Drgania tłumione: amplituda maleje, energia przechodzi w wewnętrzną.', 'Okres drgań tłumionych prawie się nie zmienia.', 'Rezonans: pobudzanie w rytmie drgań własnych mocno zwiększa amplitudę.'] }
+  ],
+  cheatsheet: [
+    { title: 'Pojęcia', items: [['Ruch drgający', 'ruch tam i z powrotem wokół położenia równowagi'], ['Położenie równowagi (O)', 'miejsce, w którym ciało spoczywa, gdy nie drga'], ['Wychylenie (x)', 'odległość od położenia równowagi w danej chwili [m]'], ['Amplituda (A)', 'największe wychylenie [m]'], ['Pełne drganie', 'A → O → B → O → A (tam i z powrotem)'], ['Okres (T)', 'czas jednego pełnego drgania [s]'], ['Częstotliwość (f)', 'liczba drgań w ciągu 1 sekundy [Hz]']] },
+    { title: 'Wzory', formulas: [['f = 1 / T', 'częstotliwość z okresu'], ['T = 1 / f', 'okres z częstotliwości'], ['T = t / n', 'okres z czasu t i liczby drgań n'], ['f = n / t', 'częstotliwość z liczby drgań i czasu'], ['n = t / T = f · t', 'liczba drgań w czasie t']] },
+    { title: 'Jednostki', items: [['okres T', 'sekunda, s'], ['częstotliwość f', 'herc, Hz; 1 Hz = 1/s, czyli 1 drganie na sekundę'], ['amplituda A', 'metr, m (często cm)'], ['liczba drgań n', 'bez jednostki'], ['zamiana', '1 min = 60 s;  1 ms = 0,001 s']] },
+    { title: 'Wahadło', list: ['dłuższa nić → dłuższy okres (waha się wolniej)', 'krótsza nić → krótszy okres (szybciej)', 'masa kulki NIE zmienia okresu', 'przy małych wychyleniach amplituda nie zmienia okresu'] },
+    { title: 'Ciężarek na sprężynie', list: ['większa masa → dłuższy okres', 'sztywniejsza sprężyna → krótszy okres', 'tu masa MA znaczenie (inaczej niż w wahadle)'] },
+    { title: 'Energia', list: ['skrajne położenie: v = 0, Ep największa, Ek = 0', 'położenie równowagi: v największa, Ek największa, Ep najmniejsza', 'bez oporów: Ep + Ek = const'] },
+    { title: 'Tłumienie i rezonans', list: ['drgania tłumione: amplituda maleje, bo opory ruchu zamieniają energię mechaniczną na wewnętrzną', 'okres drgań tłumionych prawie się nie zmienia', 'rezonans: pobudzanie w rytmie drgań własnych → amplituda mocno rośnie (huśtawka, most)'] },
+    { title: 'Przykład zadania', example: { task: 'Wahadło wykonało 20 drgań w 30 s. Oblicz T i f.', lines: ['Dane: n = 20, t = 30 s. Szukane: T, f.', 'T = t / n = 30 s / 20 = 1,5 s', 'f = 1 / T = 1 / 1,5 s ≈ 0,67 Hz  (lub f = n / t = 20 / 30 s ≈ 0,67 Hz)', 'Odp.: T = 1,5 s, f ≈ 0,67 Hz.'] } },
+    { title: 'Uwaga na pułapki', wide: true, list: ['amplituda to NIE odległość między skrajnymi położeniami – to 2A', 'pełne drganie = tam i z powrotem, a nie tylko „na drugą stronę”', 'w wyniku zawsze zapisuj jednostkę', 'minuty i milisekundy zamień na sekundy przed liczeniem'] }
+  ]
+});
+
+/* =====================================================================
+   JAK DODAĆ KOLEJNY MODUŁ (np. „Fale mechaniczne”):
+   registerModule({ id:'fale', short:'Moduł 2', title:'Fale mechaniczne',
+     concepts:{...}, experiments:{ nazwa(host, api){...} }, questions:[...],
+     missions:[{ id, title, place, icon, requires, experiment, expTitle, core, intro, learned }],
+     cheatsheet:[...] });
+   Mapa automatycznie pokaże zakładki modułów. Silnik zadań, punkty, odznaki,
+   pomyłki i tryby sprawdzania działają bez zmian.
+   ===================================================================== */
+
+/* ===== START GRY ===== */
+(function boot() {
+  $('#btnHome').append(icon('map'));
+  $('#btnSettings').append(icon('gear'));
+  $('#btnHome').addEventListener('click', () => go('map'));
+  $('#btnSettings').addEventListener('click', openSettings);
+  $('#btnSound').addEventListener('click', () => { S.settings.sound = !S.settings.sound; persist(); updateHUD(); Sound.play('ok'); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !$('#overlay').hidden) { closeOverlay(); return; }
+    if (!$('#overlay').hidden) return;
+    for (const it of [...Keys]) { if (it.el && !it.el.isConnected) { Keys.delete(it); continue; } it.fn(e); }
+  });
+  // Kolory canvasa nadążają za motywem (systemowym i ustawionym przez stronę)
+  try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readColors); } catch (e) { }
+  new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-contrast'] });
+  streakMsg = updateStreak();
+  applySettings();
+  checkBadges();
+  go('map');
+})();
+</script>
+</body>
+</html>
